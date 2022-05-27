@@ -53,10 +53,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}.tar
 
-      - name: Docker AMD image
-        run: |
-          docker image ls -a
-
       - name: Upload ${{ env.BUILD_PLATFORMS }} artifact
         uses: actions/upload-artifact@v2
         with:
