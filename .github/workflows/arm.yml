@@ -1,4 +1,4 @@
-name: Build/Release Additional Docker Platform Images
+name: Build ARM Images
 
 # Only run when:
 #   - the workflow is automatically triggered during a release with the relevant tag

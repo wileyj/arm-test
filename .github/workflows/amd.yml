@@ -1,4 +1,4 @@
-name: CI
+name: Build AMD Images
 
 # Only run when:
 #   - PRs are opened against the master branch
