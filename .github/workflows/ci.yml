@@ -12,11 +12,11 @@ env:
   BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/arm/v7
 
 jobs:
-  build-amd:
+  amd64:
     uses: wileyj/arm-test/.github/workflows/amd.yml@master
 
   # call the extra file to setup QEMU?
-  build-arm:
+  arm64:
     if: ${{ github.event.inputs.tag != '' }}
     uses: wileyj/arm-test/.github/workflows/arm.yml@master
     with:
