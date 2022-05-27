@@ -57,7 +57,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           platforms: ${{ env.BUILD_PLATFORMS }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            type=raw,value=${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             STACKS_NODE_VERSION=${{ inputs.tag || env.GITHUB_SHA_SHORT }}
