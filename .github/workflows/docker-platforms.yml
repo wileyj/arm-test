@@ -16,7 +16,7 @@ on:
         required: true
 
 env:
-  BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/arm/v7
+  BUILD_PLATFORMS: linux/arm64, linux/arm/v7
 
 jobs:
   # Build docker image, tag it with the branch and docker image tag passed in, and publish
