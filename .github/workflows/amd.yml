@@ -5,12 +5,11 @@ name: Build AMD Images
 #   - the workflow is started from the UI (an optional tag can be passed in via parameter)
 #     - If the optional tag parameter is passed in, a new tag will be generated based off the selected branch
 on:
-  pull_request:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "The tag to create (optional)"
-        required: false
+  workflow_call:
+    outputs:
+      amd_image:
+        description: "AMD Image"
+        value: ${{ jobs.my_job.outputs.job_output1 }}
 
 concurrency:
   group: arm-test-${{ github.ref }}
@@ -21,16 +20,6 @@ env:
   BUILD_PLATFORMS: linux/amd64
 
 jobs:
-  # call the extra file to setup QEMU?
-  call-docker-platforms-workflow:
-    if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/docker-platforms.yml@master
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
   # Build docker image, tag it with the git tag and `latest` if running on master branch, and publish under the following conditions
   # Will publish if:
   #   - a tag was passed into this workflow
@@ -58,7 +47,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha
-            type=raw,value=${{ github.event.inputs.tag }}
+            type=raw,value=${{ inputs.tag }}
 
       - name: Set up Docker Buildx notag
         # if: ${{ github.event.inputs.tag == '' }}
