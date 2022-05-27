@@ -58,7 +58,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=sha
-            ${{ github.event.inputs.tag }}
+            type=raw,value=${{ github.event.inputs.tag }}
 
       - name: Set up Docker Buildx notag
         # if: ${{ github.event.inputs.tag == '' }}
@@ -76,8 +76,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           platforms: ${{ env.BUILD_PLATFORMS }}
-          tags: |
-            type=raw,value=${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             STACKS_NODE_VERSION=${{ github.event.inputs.tag || env.GITHUB_SHA_SHORT }}
