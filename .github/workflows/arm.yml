@@ -42,8 +42,8 @@ jobs:
         with:
           images: |
             wileyj/${{ github.event.repository.name }}
-          tags: |
-            type=raw,value=${{ env.OS_ARCH }}
+          # tags: |
+          #   type=raw,value=${{ env.OS_ARCH }}
 
       - name: Set up Docker Buildx ${{ env.OS_ARCH }}
         uses: docker/setup-buildx-action@v2
