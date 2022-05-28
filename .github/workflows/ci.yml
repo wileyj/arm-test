@@ -9,7 +9,7 @@ on:
         required: false
 
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/arm/v7
+  BUILD_PLATFORMS: linux/amd64, linux/arm64
 
 jobs:
   amd64:
@@ -69,3 +69,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push branch
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ env.BUILD_PLATFORMS }}
+          push: true
+          tags: wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
+
+      - name: Build and push tag
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: ${{ env.BUILD_PLATFORMS }}
+          push: true
+          tags: wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
