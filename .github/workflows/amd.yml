@@ -6,10 +6,10 @@ name: Build AMD Images
 #     - If the optional tag parameter is passed in, a new tag will be generated based off the selected branch
 on:
   workflow_call:
-    outputs:
-      amd_image:
-        description: "AMD Image"
-        value: ${{ jobs.my_job.outputs.job_output1 }}
+    # inputs:
+    #   branch:
+    #     required: true
+    #     type: string
 
 concurrency:
   group: arm-test-${{ github.ref }}
@@ -44,7 +44,6 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            # type=sha
             type=raw,value=${{ inputs.tag }}
 
       - name: Set up Docker Buildx
@@ -62,17 +61,22 @@ jobs:
         with:
           name: ${{ github.event.repository.name }}
           path: /tmp/${{ github.event.repository.name }}-amd64.tar
+# docker manifest create
+# wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }} \
+# --amend your-username/multiarch-example:manifest-amd64 \
+# --amend your-username/multiarch-example:manifest-arm32v7 \
+# --amend your-username/multiarch-example:manifest-arm64v8
 
-      # - name: Build/Tag/Push Image notag
-      #   # if: ${{ github.event.inputs.tag == '' }}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     platforms: ${{ env.BUILD_PLATFORMS }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     build-args: |
-      #       STACKS_NODE_VERSION=${{ github.event.inputs.tag || env.GITHUB_SHA_SHORT }}
-      #       GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
-      #       GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
-      #     push: true
-      #     # push: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+# - name: Build/Tag/Push Image notag
+#   # if: ${{ github.event.inputs.tag == '' }}
+#   uses: docker/build-push-action@v3
+#   with:
+#     platforms: ${{ env.BUILD_PLATFORMS }}
+#     tags: ${{ steps.meta.outputs.tags }}
+#     labels: ${{ steps.meta.outputs.labels }}
+#     build-args: |
+#       STACKS_NODE_VERSION=${{ github.event.inputs.tag || env.GITHUB_SHA_SHORT }}
+#       GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
+#       GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
+#     push: true
+#     # push: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
