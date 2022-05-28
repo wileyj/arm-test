@@ -53,8 +53,8 @@ jobs:
         with:
           platforms: ${{ env.BUILD_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
-          # outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
-          push: true
+          outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
+          # push: true
 
       - name: Upload artifact ${{ env.OS_ARCH }}
         uses: actions/upload-artifact@v2
