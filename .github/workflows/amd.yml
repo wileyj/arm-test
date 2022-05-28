@@ -28,10 +28,8 @@ jobs:
         with:
           images: |
             wileyj/${{ github.event.repository.name }}
-          # tags: |
-          #   type=ref,event=branch
-          #   type=ref,event=pr
-          #   type=raw,value=${{ inputs.tag }}
+          tags: |
+            type=raw,value=${{ env.OS_ARCH }}
 
       - name: Set up Docker Buildx ${{ env.OS_ARCH }}
         uses: docker/setup-buildx-action@v2
@@ -40,7 +38,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           platforms: ${{ env.BUILD_PLATFORMS }}
-          tags: ${{ env.OS_ARCH }}
+          tags: ${{ steps.meta.outputs.tags }}
           outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
 
       - name: Upload artifact ${{ env.OS_ARCH }}
