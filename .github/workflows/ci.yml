@@ -81,6 +81,7 @@ jobs:
           tags: wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
 
       - name: Build and push tag
+        if: ${{ github.event.inputs.tag != '' }}
         uses: docker/build-push-action@v3
         with:
           context: .
