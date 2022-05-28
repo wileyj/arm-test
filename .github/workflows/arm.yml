@@ -50,14 +50,15 @@ jobs:
           name: ${{ github.event.repository.name }}
           path: /tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
 
-      # - name: Build/Tag/Push Image
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     platforms: ${{ env.BUILD_PLATFORMS }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
-      #     build-args: |
-      #       STACKS_NODE_VERSION=${{ inputs.tag || env.GITHUB_SHA_SHORT }}
-      #       GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
-      #       GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
-      #     push: true
+      - name: Create tag manifest
+        if: ${{ github.event.inputs.tag == '' }}
+        run: |
+          docker manifest create wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }} \
+          --amend wileyj/${{ github.event.repository.name }}:arm64
+          docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
+
+      - name: Create branch manifest
+        run: |
+          docker manifest create wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }} \
+          --amend wileyj/${{ github.event.repository.name }}:arm64
+          docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
