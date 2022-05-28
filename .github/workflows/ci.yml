@@ -41,6 +41,7 @@ jobs:
           docker image ls
 
       - name: Load ARM Image
+        if: ${{ github.event.inputs.tag != '' }}
         run: |
           docker load --input /tmp/${{ github.event.repository.name }}-arm64.tar
           docker image ls
