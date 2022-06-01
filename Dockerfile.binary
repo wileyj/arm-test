@@ -17,11 +17,11 @@ RUN printf "I'm building for: \n" \
     && printf "and  uname -m : " && uname -m
 
 
-RUN case ${TARGETPLATFORM} in \
-    "linux/amd64")  BIN_ARCH=linux-x64  ;; \
-    "linux/arm64")  BIN_ARCH=linux_arm64  ;; \
-    "linux/armv7") BIN_ARCH=linux_armv7  ;; \
-    "linux/arm/v6") BIN_ARCH=linux_armv6  ;; \
+RUN case ${TARGETARCH} in \
+    "amd64")  BIN_ARCH=linux-x64  ;; \
+    "arm64")  BIN_ARCH=linux_arm64  ;; \
+    "armv7") BIN_ARCH=linux_armv7  ;; \
+    "arm") BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
     && echo "wget  https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O ./arm-test.zip"
 #     && wget -q https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-${TINI_ARCH} -O /tini \
