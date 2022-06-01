@@ -9,17 +9,22 @@ on:
         required: false
 
 env:
-  BUILD_PLATFORMS:
-    - linux/amd64
-    - linux/arm64
-    - linux/armv7
-    - linux/arm64/v8
+  BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/armv7, linux/arm64/v8
   # BUILD_PLATFORMS:
   #   - linux/amd64
   #   - linux/arm64
   #   - linux/arm64/v8
   #   - linux/arm/v7
   #   - linux/arm/v6
+  #   - darwin/amd64
+
+  # - windows-x64
+  # - macos-x64
+  # - macos-arm64
+  # - linux-x64
+  # - linux-musl-x64
+  # - linux-armv7
+  # - linux-arm64
 
 jobs:
   # amd64:
@@ -78,61 +83,6 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: ${{ matrix.platform }}.zip
-
-      ### artifacts
-      # - name: Download artifact
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: ${{ github.event.repository.name }}
-      #     path: /tmp
-
-      # - name: Load AMD Image
-      #   run: |
-      #     docker load --input /tmp/${{ github.event.repository.name }}-amd64.tar
-      #     docker image ls
-
-      # - name: Load ARM Image
-      #   if: ${{ github.event.inputs.tag != '' }}
-      #   run: |
-      #     docker load --input /tmp/${{ github.event.repository.name }}-arm64.tar
-      #     docker image ls
-
-      # - name: List images
-      #   run: |
-      #     docker image ls
-
-      ### manifest
-      # - name: List Tag Manifest
-      #   if: ${{ github.event.inputs.tag != '' }}
-      #   run: |
-      #     docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
-
-      # - name: List Branch Manifest
-      #   run: |
-      #     docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
-
-      # - name: Login to DockerHub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      # - name: Build and push branch
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     platforms: ${{ env.BUILD_PLATFORMS }}
-      #     push: true
-      #     tags: wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
-
-      # - name: Build and push tag
-      #   if: ${{ github.event.inputs.tag != '' }}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     platforms: ${{ env.BUILD_PLATFORMS }}
-      #     push: true
-      #     tags: wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
 
   create-release:
     runs-on: ubuntu-latest
@@ -233,6 +183,7 @@ jobs:
           platforms: ${{ env.BUILD_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
+            BUILDKIT_PROGRESS=plain
             OS_ARCH=${{ matrix.platform }}
             TAG=${{ github.event.inputs.tag}}
             GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
