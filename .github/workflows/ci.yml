@@ -129,8 +129,6 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     needs:
       - dist
-      - build-publish
-      - build-publish-stretch
 
     steps:
       - name: Create Release
