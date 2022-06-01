@@ -1,0 +1,24 @@
+FROM rust:stretch as build
+
+ARG OS_ARCH=linux-armv7
+ARG GIT_BRANCH='No Branch Info'
+ARG GIT_COMMIT='No Commit Info'
+# ENV OS_ARCH=${OS_ARCH}
+
+WORKDIR /src
+
+COPY . .
+
+RUN rustup target add armv7-unknown-linux-gnueabihf
+
+RUN apt-get update && apt-get install -y git gcc-arm-linux-gnueabihf
+
+RUN CC=arm-linux-gnueabihf-gcc \
+    CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc \
+    CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc \
+    cargo build --release --workspace --target armv7-unknown-linux-gnueabihf
+
+RUN mkdir /out && cp -R /src/target/armv7-unknown-linux-gnueabihf/release/. /out
+
+FROM scratch AS export-stage
+COPY --from=build /out/rusty-blockparser /usr/bin/rusty-blockparser

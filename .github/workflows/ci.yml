@@ -12,57 +12,88 @@ env:
   BUILD_PLATFORMS: linux/amd64, linux/arm64
 
 jobs:
-  amd64:
-    uses: wileyj/arm-test/.github/workflows/amd.yml@master
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  # amd64:
+  #   uses: wileyj/arm-test/.github/workflows/amd.yml@master
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  # call the extra file to setup QEMU?
-  arm64:
-    if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/arm.yml@master
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  # # call the extra file to setup QEMU?
+  # arm64:
+  #   if: ${{ github.event.inputs.tag != '' }}
+  #   uses: wileyj/arm-test/.github/workflows/arm.yml@master
+  #   with:
+  #     tag: ${{ github.event.inputs.tag }}
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  build:
+  # Create distributions
+  dist:
     runs-on: ubuntu-latest
-    needs: amd64 # amd64 being the default arch, require it
+    strategy:
+      matrix:
+        platform:
+          - windows-x64
+          - macos-x64
+          - macos-arm64
+          - linux-x64
+          - linux-musl-x64
+          - linux-armv7
+          - linux-arm64
+
     steps:
       - uses: actions/checkout@v2
-
       - name: Set Vars
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v1
 
-      - name: Download artifact
-        uses: actions/download-artifact@v2
+      - name: Build distributable
+        uses: docker/build-push-action@v3
         with:
-          name: ${{ github.event.repository.name }}
-          path: /tmp
+          file: build-scripts/Dockerfile.${{ matrix.platform }}
+          outputs: dist/${{ matrix.platform }}
+          build-args: |
+            OS_ARCH=${{ matrix.platform }}
+            GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
+            GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
 
-      - name: Load AMD Image
-        run: |
-          docker load --input /tmp/${{ github.event.repository.name }}-amd64.tar
-          docker image ls
+      - name: Compress artifact
+        run: zip --junk-paths ${{ matrix.platform }} ./dist/${{ matrix.platform }}/*
 
-      - name: Load ARM Image
-        if: ${{ github.event.inputs.tag != '' }}
-        run: |
-          docker load --input /tmp/${{ github.event.repository.name }}-arm64.tar
-          docker image ls
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}
+          path: ${{ matrix.platform }}.zip
 
-      - name: List images
-        run: |
-          docker image ls
+      ### artifacts
+      # - name: Download artifact
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: ${{ github.event.repository.name }}
+      #     path: /tmp
 
+      # - name: Load AMD Image
+      #   run: |
+      #     docker load --input /tmp/${{ github.event.repository.name }}-amd64.tar
+      #     docker image ls
+
+      # - name: Load ARM Image
+      #   if: ${{ github.event.inputs.tag != '' }}
+      #   run: |
+      #     docker load --input /tmp/${{ github.event.repository.name }}-arm64.tar
+      #     docker image ls
+
+      # - name: List images
+      #   run: |
+      #     docker image ls
+
+      ### manifest
       # - name: List Tag Manifest
       #   if: ${{ github.event.inputs.tag != '' }}
       #   run: |
@@ -94,3 +125,50 @@ jobs:
       #     platforms: ${{ env.BUILD_PLATFORMS }}
       #     push: true
       #     tags: wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
+
+  build:
+    runs-on: ubuntu-latest
+    # needs: amd64 # amd64 being the default arch, require it
+    strategy:
+      matrix:
+        platform:
+          - linux-x64
+          - linux-armv7
+          - linux-arm64
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Vars
+        run: |
+          echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Docker meta ${{ env.OS_ARCH }}
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            wileyj/${{ github.event.repository.name }}
+          tags: |
+            ${{ env.OS_ARCH }}
+
+      - name: Set up Docker Buildx ${{ env.OS_ARCH }}
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Image ${{ env.OS_ARCH }}
+        uses: docker/build-push-action@v3
+        with:
+          file: build-scripts/Dockerfile.${{ matrix.platform }}
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            OS_ARCH=${{ matrix.platform }}
+            GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
+            GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
+          push: true

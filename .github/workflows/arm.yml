@@ -42,8 +42,8 @@ jobs:
         with:
           images: |
             wileyj/${{ github.event.repository.name }}
-          # tags: |
-          #   type=raw,value=${{ env.OS_ARCH }}
+          tags: |
+            ${{ env.OS_ARCH }}
 
       - name: Set up Docker Buildx ${{ env.OS_ARCH }}
         uses: docker/setup-buildx-action@v2
@@ -51,26 +51,27 @@ jobs:
       - name: Build ${{ env.OS_ARCH }} Image
         uses: docker/build-push-action@v3
         with:
+          file: ./Dockerfile
           platforms: ${{ env.BUILD_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
-          outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
-          # push: true
+          # outputs: type=docker,dest=/tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
+          push: true
 
-      - name: Upload artifact ${{ env.OS_ARCH }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ github.event.repository.name }}
-          path: /tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
+      # - name: Upload artifact ${{ env.OS_ARCH }}
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ github.event.repository.name }}
+      #     path: /tmp/${{ github.event.repository.name }}-${{ env.OS_ARCH }}.tar
 
-      # - name: Create tag manifest
-      #   if: ${{ github.event.inputs.tag != '' }}
-      #   run: |
-      #     docker manifest create wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }} \
-      #     --amend wileyj/${{ github.event.repository.name }}:arm64
-      #     docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
+      - name: Create ${{ env.OS_ARCH }} tag manifest
+        if: ${{ github.event.inputs.tag != '' }}
+        run: |
+          docker manifest create wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }} \
+          --amend wileyj/${{ github.event.repository.name }}:${{ env.OS_ARCH }}
+          docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ github.event.inputs.tag }}
 
-      # - name: Create branch manifest
-      #   run: |
-      #     docker manifest create wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }} \
-      #     --amend wileyj/${{ github.event.repository.name }}:arm64
-      #     docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}
+      - name: Create ${{ env.OS_ARCH }} branch manifest
+        run: |
+          docker manifest create wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }} \
+          --amend wileyj/${{ github.event.repository.name }}:${{ env.OS_ARCH }}
+          docker manifest inspect wileyj/${{ github.event.repository.name }}:${{ env.GITHUB_REF_SHORT }}

@@ -1,0 +1,24 @@
+FROM rust:stretch as build
+
+ARG OS_ARCH=linux-musl
+ARG GIT_BRANCH='No Branch Info'
+ARG GIT_COMMIT='No Commit Info'
+# ENV OS_ARCH=${OS_ARCH}
+
+WORKDIR /src
+
+COPY . .
+
+RUN rustup target add x86_64-unknown-linux-musl
+
+RUN apt-get update && apt-get install -y git musl-tools
+
+RUN CC=musl-gcc \
+    CC_x86_64_unknown_linux_musl=musl-gcc \
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc \
+    cargo build --release --workspace --target x86_64-unknown-linux-musl
+
+RUN mkdir /out && cp -R /src/target/x86_64-unknown-linux-musl/release/. /out
+
+FROM scratch AS export-stage
+COPY --from=build /out/rusty-blockparser /usr/bin/rusty-blockparser
