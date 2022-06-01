@@ -9,7 +9,7 @@ on:
         required: false
 
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/armv7, linux/arm64/v8
+  BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/armv7
   # BUILD_PLATFORMS:
   #   - linux/amd64
   #   - linux/arm64
@@ -142,13 +142,13 @@ jobs:
     runs-on: ubuntu-latest
     # if: ${{ github.event.inputs.tag != '' }}
     needs: upload-dist
-    strategy:
-      matrix:
-        platform:
-          - linux-x64
-          - linux-musl-x64
-          - linux-armv7
-          - linux-arm64
+    # strategy:
+    #   matrix:
+    #     platform:
+    #       - linux-x64
+    #       - linux-musl-x64
+    #       - linux-armv7
+    #       - linux-arm64
 
     steps:
       - uses: actions/checkout@v2
@@ -184,7 +184,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
             BUILDKIT_PROGRESS=plain
-            OS_ARCH=${{ matrix.platform }}
             TAG=${{ github.event.inputs.tag}}
             GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
