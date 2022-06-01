@@ -41,6 +41,7 @@ jobs:
   # Create distributions
   dist:
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.tag != '' }}
     strategy:
       matrix:
         platform:
@@ -189,6 +190,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    # if: ${{ github.event.inputs.tag != '' }}
     needs: upload-dist
     strategy:
       matrix:
@@ -224,16 +226,16 @@ jobs:
       - name: Set up Docker Buildx ${{ env.OS_ARCH }}
         uses: docker/setup-buildx-action@v2
 
-      # - name: Build Image ${{ env.OS_ARCH }}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     file: ./Dockerfile.binary
-      #     platforms: ${{ env.BUILD_PLATFORMS }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     build-args: |
-      #       OS_ARCH=${{ matrix.platform }}
-      #       TAG=${{ github.event.inputs.tag}}
-      #       GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
-      #       GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
-      #     # push: true
-      #     push: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+      - name: Build Image ${{ env.OS_ARCH }}
+        uses: docker/build-push-action@v3
+        with:
+          file: ./Dockerfile.binary
+          platforms: ${{ env.BUILD_PLATFORMS }}
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            OS_ARCH=${{ matrix.platform }}
+            TAG=${{ github.event.inputs.tag}}
+            GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
+            GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
+          # push: true
+          push: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
