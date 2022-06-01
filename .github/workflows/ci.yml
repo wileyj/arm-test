@@ -9,7 +9,23 @@ on:
         required: false
 
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/arm64, linux/armv7, linux/arm/v6
+  DIST_PLATFORMS: [linux-x64, linux-musl-x64, linux-armv7, linux-arm64]
+  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/amd64/v4, linux/arm64, linux/armv7, linux/arm/v6
+  # required arch:
+  #   linux/amd64
+  #   linux/amd64/v2
+  #   linux/amd64/v3
+  #   linux/amd64/v4
+  #   linux/arm64
+  #   linux/arm/v7
+  #   linux/arm/v6
+  # arch not needed:
+  #   linux/riscv64
+  #   linux/ppc64le
+  #   linux/s390x
+  #   linux/386
+  #   linux/mips64le
+  #   linux/mips64
 
 jobs:
   # amd64:
@@ -34,11 +50,12 @@ jobs:
     if: ${{ github.event.inputs.tag != '' }}
     strategy:
       matrix:
-        platform:
-          - linux-x64
-          - linux-musl-x64
-          - linux-armv7
-          - linux-arm64
+        platform: ${{ env.DIST_PLATFORMS }}
+        # platform:
+        #   - linux-x64
+        #   - linux-musl-x64
+        #   - linux-armv7
+        #   - linux-arm64
 
     steps:
       - uses: actions/checkout@v2
@@ -99,11 +116,12 @@ jobs:
       - create-release
     strategy:
       matrix:
-        platform:
-          - linux-x64
-          - linux-musl-x64
-          - linux-armv7
-          - linux-arm64
+        platform: ${{ env.DIST_PLATFORMS }}
+        # platform:
+        #   - linux-x64
+        #   - linux-musl-x64
+        #   - linux-armv7
+        #   - linux-arm64
 
     steps:
       - uses: actions/checkout@v2

@@ -2,30 +2,31 @@ FROM --platform=${BUILDPLATFORM} alpine
 
 ARG TAG
 ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 ARG TARGETARCH
 ARG TARGETVARIANT
 
-RUN apk update && apk add curl
-# ARG TARGETPLATFORM
-# RUN case ${TARGETPLATFORM} in \
-#     "linux/amd64")  ARCH=linux-x64  ;; \
-#     "linux/arm64")  ARCH=linux_arm64  ;; \
-#     "linux/arm/v7") ARCH=linux_armv7  ;; \
-#     "linux/x64")    TINI_ARCH=linux-x64   ;; \
-#     esac \
+RUN apk update
+RUN printf "I'm building for: \n" \
+    && printf " TARGETPLATFORM=${TARGETPLATFORM} \n" \
+    && printf " TARGETARCH=${TARGETARCH} \n" \
+    && printf " TARGETVARIANT=${TARGETVARIANT} \n" \
+    && printf " TAG=${TAG} \n" \
+    && printf " BUILDPLATFORM=${BUILDPLATFORM} \n" \
+    && printf "With uname -s : " && uname -s \
+    && printf "and  uname -m : " && uname -m
+
+
+RUN case ${TARGETPLATFORM} in \
+    "linux/amd64")  BIN_ARCH=linux-x64  ;; \
+    "linux/arm64")  BIN_ARCH=linux_arm64  ;; \
+    "linux/armv7") BIN_ARCH=linux_armv7  ;; \
+    "linux/arm/v6") BIN_ARCH=linux_armv6  ;; \
+    esac \
+    && echo "wget  https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O ./arm-test.zip"
 #     && wget -q https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-${TINI_ARCH} -O /tini \
 #     && chmod +x /tini
 
-# RUN curl -sL https://github.com/wileyj/arm-test/releases/download/${TAG}/${OS_ARCH}.zip -o /tmp/arm-test.zip
 # RUN unzip /tmp/arm-test.zip -d /usr/bin 
-
-
-RUN printf "I'm building for TARGETPLATFORM=${TARGETPLATFORM}" \
-    && printf ", TARGETARCH=${TARGETARCH}" \
-    && printf ", TARGETVARIANT=${TARGETVARIANT} \n" \
-    && printf ", TAG=${TAG} \n" \
-    && printf ", BUILDPLATFORM=${BUILDPLATFORM} \n" \
-    && printf "With uname -s : " && uname -s \
-    && printf "and  uname -m : " && uname -m
 
 CMD "sh"
