@@ -1,0 +1,7 @@
+FROM --platform=$OS_ARCH alpine
+
+RUN apk update && apk add curl
+RUN curl -sL https://github.com/wileyj/arm-test/releases/download/${TAG}/${OS_ARCH}.zip -o /tmp/arm-test.zip
+RUN unzip /tmp/arm-test.zip -d /usr/bin 
+
+CMD "sh"
