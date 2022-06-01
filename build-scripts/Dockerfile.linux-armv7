@@ -21,4 +21,4 @@ RUN CC=arm-linux-gnueabihf-gcc \
 RUN mkdir /out && cp -R /src/target/armv7-unknown-linux-gnueabihf/release/. /out
 
 FROM scratch AS export-stage
-COPY --from=build /out/rusty-blockparser /usr/bin/rusty-blockparser
+COPY --from=build /out/rusty-blockparser /

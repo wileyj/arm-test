@@ -20,4 +20,4 @@ RUN CC_x86_64_pc_windows_gnu=x86_64-w64-mingw32-gcc \
 RUN mkdir /out && cp -R /src/target/x86_64-pc-windows-gnu/release/. /out
 
 FROM scratch AS export-stage
-COPY --from=build /out/rusty-blockparser /usr/bin/rusty-blockparser
+COPY --from=build /out/rusty-blockparser /

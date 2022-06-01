@@ -18,4 +18,4 @@ RUN cargo build --release --workspace --target x86_64-unknown-linux-gnu
 RUN mkdir /out && cp -R /src/target/x86_64-unknown-linux-gnu/release/. /out
 
 FROM scratch AS export-stage
-COPY --from=build /out/rusty-blockparser /usr/bin/rusty-blockparser
+COPY --from=build /out/rusty-blockparser /
