@@ -10,7 +10,6 @@ ARG TARGETVARIANT
 RUN case ${TARGETARCH} in \
     "amd64")  BIN_ARCH=linux-x64  ;; \
     "arm64")  BIN_ARCH=linux_arm64  ;; \
-    "armv7")  BIN_ARCH=linux_armv7  ;; \
     "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
     && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip" \
