@@ -14,7 +14,7 @@ RUN case ${TARGETARCH} in \
     "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
     && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip \
-    && unzip /tmp/${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
+    && unzip ${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
 
 RUN echo "TARGETPLATFORM=${TARGETPLATFORM}" >> /log \
     && echo "TARGETARCH=${TARGETARCH}" >> /log  \
