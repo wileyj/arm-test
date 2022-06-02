@@ -13,6 +13,7 @@ RUN case ${TARGETARCH} in \
     "armv7")  BIN_ARCH=linux_armv7  ;; \
     "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
+    && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip" \
     && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip \
     && unzip ${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
 
