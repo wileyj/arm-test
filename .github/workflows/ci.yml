@@ -10,21 +10,6 @@ on:
 
 env:
   BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/amd64/v4, linux/arm64, linux/armv7, linux/arm/v6
-  # required arch:
-  #   linux/amd64
-  #   linux/amd64/v2
-  #   linux/amd64/v3
-  #   linux/amd64/v4
-  #   linux/arm64
-  #   linux/arm/v7
-  #   linux/arm/v6
-  # arch not needed:
-  #   linux/riscv64
-  #   linux/ppc64le
-  #   linux/s390x
-  #   linux/386
-  #   linux/mips64le
-  #   linux/mips64
 
 jobs:
   # amd64:
@@ -54,7 +39,11 @@ jobs:
           - linux-x64
           - linux-musl-x64
           - linux-armv7
+          - linux-armv6
           - linux-arm64
+          - windows-x64
+          - macos-x64
+          - macos-arm64
 
     steps:
       - uses: actions/checkout@v2
@@ -120,7 +109,11 @@ jobs:
           - linux-x64
           - linux-musl-x64
           - linux-armv7
+          - linux-armv6
           - linux-arm64
+          - windows-x64
+          - macos-x64
+          - macos-arm64
 
     steps:
       - uses: actions/checkout@v2
@@ -144,13 +137,6 @@ jobs:
     runs-on: ubuntu-latest
     # if: ${{ github.event.inputs.tag != '' }}
     needs: upload-dist
-    # strategy:
-    #   matrix:
-    #     platform:
-    #       - linux-x64
-    #       - linux-musl-x64
-    #       - linux-armv7
-    #       - linux-arm64
 
     steps:
       - uses: actions/checkout@v2

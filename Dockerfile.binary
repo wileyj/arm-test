@@ -1,12 +1,13 @@
 FROM --platform=${BUILDPLATFORM} alpine
 
 ARG TAG
+ARG BIN_ARCH
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 ARG TARGETARCH
 ARG TARGETVARIANT
 
-RUN apk update
+RUN apk update && apk add curl
 RUN printf "I'm building for: \n" \
     && printf " TARGETPLATFORM=${TARGETPLATFORM} \n" \
     && printf " TARGETARCH=${TARGETARCH} \n" \
@@ -20,9 +21,11 @@ RUN printf "I'm building for: \n" \
 RUN case ${TARGETARCH} in \
     "amd64")  BIN_ARCH=linux-x64  ;; \
     "arm64")  BIN_ARCH=linux_arm64  ;; \
-    "armv7") BIN_ARCH=linux_armv7  ;; \
-    "arm") BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
+    "armv7")  BIN_ARCH=linux_armv7  ;; \
+    "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
     && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /tmp/arm-test.zip
+# if [ $(curl -LI https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then curl -sL wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -o /tmp/arm-test.zip; fi
+
 RUN unzip /tmp/arm-test.zip -d /bin && chmod +x /bin/rusty-blockparser
 CMD "sh"
