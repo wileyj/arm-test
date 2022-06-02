@@ -9,16 +9,16 @@ WORKDIR /src
 
 COPY . .
 
-RUN rustup target add armv6-unknown-linux-gnueabihf
+RUN rustup target add arm-unknown-linux-gnueabihf
 
 RUN apt-get update && apt-get install -y git gcc-arm-linux-gnueabihf
 
 RUN CC=arm-linux-gnueabihf-gcc \
-    CC_armv6_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc \
-    CARGO_TARGET_ARMV6_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc \
-    cargo build --release --workspace --target armv6-unknown-linux-gnueabihf
+    CC_arm_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc \
+    CARGO_TARGET_ARM_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc \
+    cargo build --release --workspace --target arm-unknown-linux-gnueabihf
 
-RUN mkdir /out && cp -R /src/target/armv6-unknown-linux-gnueabihf/release/. /out
+RUN mkdir /out && cp -R /src/target/arm-unknown-linux-gnueabihf/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser /
