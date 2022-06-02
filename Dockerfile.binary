@@ -23,10 +23,6 @@ RUN case ${TARGETARCH} in \
     "armv7") BIN_ARCH=linux_armv7  ;; \
     "arm") BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
-    && echo "wget  https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O ./arm-test.zip"
-#     && wget -q https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-${TINI_ARCH} -O /tini \
-#     && chmod +x /tini
-
-# RUN unzip /tmp/arm-test.zip -d /usr/bin 
-
+    && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /tmp/arm-test.zip
+RUN unzip /tmp/arm-test.zip -d /bin && chmod +x /bin/rusty-blockparser
 CMD "sh"
