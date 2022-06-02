@@ -7,26 +7,15 @@ ARG BUILDPLATFORM
 ARG TARGETARCH
 ARG TARGETVARIANT
 
-RUN apk update && apk add curl
-
 RUN case ${TARGETARCH} in \
     "amd64")  BIN_ARCH=linux-x64  ;; \
     "arm64")  BIN_ARCH=linux_arm64  ;; \
     "armv7")  BIN_ARCH=linux_armv7  ;; \
     "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
-    && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip"
-# && unzip /tmp/${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
+    && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip \
+    && unzip /tmp/${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
 
-# RUN printf "I'm building for: \n" \
-#     && printf " TARGETPLATFORM=${TARGETPLATFORM} \n" \
-#     && printf " TARGETARCH=${TARGETARCH} \n" \
-#     && printf " TARGETVARIANT=${TARGETVARIANT} \n" \
-#     && printf " TAG=${TAG} \n" \
-#     && printf " BIN_ARCH=${BIN_ARCH} \n" \
-#     && printf " BUILDPLATFORM=${BUILDPLATFORM} \n" \
-#     && printf "With uname -s : " && uname -s \
-#     && printf "and  uname -m : " && uname -m
 RUN echo "TARGETPLATFORM=${TARGETPLATFORM}" >> /log \
     && echo "TARGETARCH=${TARGETARCH}" >> /log  \
     && echo "TARGETVARIANT=${TARGETVARIANT}" >> /log  \
@@ -36,4 +25,4 @@ RUN echo "TARGETPLATFORM=${TARGETPLATFORM}" >> /log \
     && echo "With uname -s : $(uname -s)" >> /log \
     && echo "and  uname -m : $(uname -m)" >> /log
 
-CMD "sh"
+CMD "/bin/rusty-blockparser"
