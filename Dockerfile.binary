@@ -8,15 +8,6 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 
 RUN apk update && apk add curl
-RUN printf "I'm building for: \n" \
-    && printf " TARGETPLATFORM=${TARGETPLATFORM} \n" \
-    && printf " TARGETARCH=${TARGETARCH} \n" \
-    && printf " TARGETVARIANT=${TARGETVARIANT} \n" \
-    && printf " TAG=${TAG} \n" \
-    && printf " BUILDPLATFORM=${BUILDPLATFORM} \n" \
-    && printf "With uname -s : " && uname -s \
-    && printf "and  uname -m : " && uname -m
-
 
 RUN case ${TARGETARCH} in \
     "amd64")  BIN_ARCH=linux-x64  ;; \
@@ -24,8 +15,18 @@ RUN case ${TARGETARCH} in \
     "armv7")  BIN_ARCH=linux_armv7  ;; \
     "arm")    BIN_ARCH=linux_arm${TARGETVARIANT}  ;; \
     esac \
-    && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /tmp/arm-test.zip
-# if [ $(curl -LI https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then curl -sL wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -o /tmp/arm-test.zip; fi
+    && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /tmp/arm-test.zip"
+# && unzip /tmp/arm-test.zip -d /bin && chmod +x /bin/rusty-blockparser
 
-RUN unzip /tmp/arm-test.zip -d /bin && chmod +x /bin/rusty-blockparser
+RUN printf "I'm building for: \n" \
+    && printf " TARGETPLATFORM=${TARGETPLATFORM} \n" \
+    && printf " TARGETARCH=${TARGETARCH} \n" \
+    && printf " TARGETVARIANT=${TARGETVARIANT} \n" \
+    && printf " TAG=${TAG} \n" \
+    && printf " BIN_ARCH=${BIN_ARCH} \n" \
+    && printf " BUILDPLATFORM=${BUILDPLATFORM} \n" \
+    && printf "With uname -s : " && uname -s \
+    && printf "and  uname -m : " && uname -m
+
+
 CMD "sh"
