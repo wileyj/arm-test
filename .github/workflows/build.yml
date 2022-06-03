@@ -6,14 +6,14 @@ on:
       tag:
         required: true
         type: string
+      build-platforms:
+        required: true
+        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
-
-env:
-  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/arm/v6, linux/arm/v7
 
 jobs:
   docker-images:
@@ -56,7 +56,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.binary
-          platforms: ${{ env.BUILD_PLATFORMS }}
+          # platforms: ${{ env.BUILD_PLATFORMS }}
+          platforms: ${{ github.event.inputs.build-platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
             BUILDKIT_PROGRESS=plain
