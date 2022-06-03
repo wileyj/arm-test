@@ -17,5 +17,5 @@ RUN case ${TARGETARCH} in \
     && unzip ${BIN_ARCH}.zip -d /out
 
 FROM --platform=${TARGETPLATFORM} alpine
-COPY --from=build /out/ /bin/
+COPY --from=builder /out/ /bin/
 CMD ["/bin/rusty-blockparser"]
