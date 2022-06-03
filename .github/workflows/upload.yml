@@ -9,7 +9,7 @@ on:
 
 jobs:
   # Upload distributables to a new release if we're building a tag or a tag was passed in
-  upload-dist:
+  distributables:
     runs-on: ubuntu-latest
     needs:
       - create-release

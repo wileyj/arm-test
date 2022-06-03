@@ -17,34 +17,35 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  create-dist:
+  create:
     if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/dist.yml@master
+    uses: wileyj/arm-test/.github/workflows/create.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  # create-release:
+  #   if: ${{ github.event.inputs.tag != '' }}
+  #   uses: wileyj/arm-test/.github/workflows/release.yml@master
+  #   needs: create-dist
+  #   with:
+  #     tag: ${{ github.event.inputs.tag }}
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  create-release:
+  upload:
     if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/release.yml@master
-    needs: create-dist
+    uses: wileyj/arm-test/.github/workflows/upload.yml@master
+    needs: create
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  upload-dist:
+  build:
     if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/release.yml@master
-    needs: create-release
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-  build-docker:
-    if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/docker.yml@master
-    needs: upload-dist
+    uses: wileyj/arm-test/.github/workflows/build.yml@master
+    needs: upload
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
