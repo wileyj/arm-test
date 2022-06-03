@@ -17,22 +17,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  dist:
+  create-dist:
+    if: ${{ github.event.inputs.tag != '' }}
     uses: wileyj/arm-test/.github/workflows/dist.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
 
   create-release:
+    if: ${{ github.event.inputs.tag != '' }}
     uses: wileyj/arm-test/.github/workflows/release.yml@master
-    needs: dist
+    needs: create-dist
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  docker:
-    uses: wileyj/arm-test/.github/workflows/docker.yml@master
+  upload-dist:
+    if: ${{ github.event.inputs.tag != '' }}
+    uses: wileyj/arm-test/.github/workflows/release.yml@master
     needs: create-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  build-docker:
+    if: ${{ github.event.inputs.tag != '' }}
+    uses: wileyj/arm-test/.github/workflows/docker.yml@master
+    needs: upload-dist
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
