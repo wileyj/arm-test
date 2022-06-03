@@ -19,7 +19,6 @@ jobs:
     uses: wileyj/arm-test/.github/workflows/create.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
-      upload_url: ${{ needs.create.release.outputs.upload_url }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
