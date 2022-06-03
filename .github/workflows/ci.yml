@@ -35,7 +35,7 @@ jobs:
   build:
     if: ${{ github.event.inputs.tag != '' }}
     uses: wileyj/arm-test/.github/workflows/build.yml@master
-    needs: upload
+    needs: release
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
