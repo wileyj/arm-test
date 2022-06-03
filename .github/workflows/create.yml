@@ -56,22 +56,3 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: ${{ matrix.platform }}.zip
-
-  release:
-    runs-on: ubuntu-latest
-    needs: distributables
-    outputs:
-      upload_url: ${{ github.event.inputs.upload_url }}
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          # Use custom secrets.GH_TOKEN instead of default secrets.GITHUB_TOKEN because the custom token will trigger the
-          # clarity-js-sdk-pr workflow. As events caused by default tokens do not trigger subsequent workflow runs to avoid loops.
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.tag || github.ref }}
-          release_name: Release ${{ github.event.inputs.tag || github.ref }}
-          draft: false
-          prerelease: true

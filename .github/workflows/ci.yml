@@ -23,12 +23,12 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  upload:
+  release:
     if: ${{ github.event.inputs.tag != '' }}
-    uses: wileyj/arm-test/.github/workflows/upload.yml@master
+    uses: wileyj/arm-test/.github/workflows/release.yml@master
     needs: create
     with:
-      upload_url: ${{ needs.create.release.outputs.upload_url }}
+      tag: ${{ github.event.inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
