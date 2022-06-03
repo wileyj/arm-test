@@ -1,4 +1,4 @@
-name: Build Alpine Linux Docker Images
+name: Build Alpine Images
 
 on:
   workflow_call:

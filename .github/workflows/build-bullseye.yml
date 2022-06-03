@@ -1,4 +1,4 @@
-name: Build Debian Linux Docker Images
+name: Build Debian Images
 
 on:
   workflow_call:
