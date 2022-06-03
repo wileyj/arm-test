@@ -6,9 +6,6 @@ on:
       tag:
         required: true
         type: string
-      upload_url:
-        required: true
-        type: string
     secrets:
       GH_TOKEN:
         required: true
