@@ -22,23 +22,16 @@ jobs:
     uses: wileyj/arm-test/.github/workflows/create.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
+      upload_url: ${{ needs.create.release.outputs.upload_url }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  # create-release:
-  #   if: ${{ github.event.inputs.tag != '' }}
-  #   uses: wileyj/arm-test/.github/workflows/release.yml@master
-  #   needs: create-dist
-  #   with:
-  #     tag: ${{ github.event.inputs.tag }}
-  #   secrets:
-  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   upload:
     if: ${{ github.event.inputs.tag != '' }}
     uses: wileyj/arm-test/.github/workflows/upload.yml@master
     needs: create
     with:
-      tag: ${{ github.event.inputs.tag }}
+      upload_url: ${{ needs.create.release.outputs.upload_url }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
