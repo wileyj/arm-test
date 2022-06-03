@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} alpine
+FROM --platform=${TARGETPLATFORM} alpine as builder
 
 ARG TAG
 ARG BIN_ARCH
@@ -14,15 +14,8 @@ RUN case ${TARGETARCH} in \
     esac \
     && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip" \
     && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip \
-    && unzip ${BIN_ARCH}.zip -d /bin && chmod +x /bin/rusty-blockparser
+    && unzip ${BIN_ARCH}.zip -d /out
 
-RUN echo "TARGETPLATFORM=${TARGETPLATFORM}" >> /log \
-    && echo "TARGETARCH=${TARGETARCH}" >> /log  \
-    && echo "TARGETVARIANT=${TARGETVARIANT}" >> /log  \
-    && echo "TAG=${TAG}" >> /log  \
-    && echo "BIN_ARCH=${BIN_ARCH}" >> /log  \
-    && echo "BUILDPLATFORM=${BUILDPLATFORM}" >> /log  \
-    && echo "With uname -s : $(uname -s)" >> /log \
-    && echo "and  uname -m : $(uname -m)" >> /log
-
-CMD "/bin/rusty-blockparser"
+FROM --platform=${TARGETPLATFORM} alpine
+COPY --from=build /out/ /bin/
+CMD ["/bin/rusty-blockparser"]
