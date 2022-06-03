@@ -6,7 +6,9 @@ on:
       tag:
         required: true
         type: string
-
+    secrets:
+      GH_TOKEN:
+        required: true
 jobs:
   # Upload distributables to a new release if we're building a tag or a tag was passed in
   distributables:
