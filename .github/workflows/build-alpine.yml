@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Build Alpine Linux Docker Images
 
 on:
   workflow_call:
@@ -12,10 +12,10 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64, linux/arm/v6, linux/arm/v7
+  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64
 
 jobs:
-  docker:
+  images:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -54,7 +54,7 @@ jobs:
       - name: Build Image
         uses: docker/build-push-action@v3
         with:
-          file: ./Dockerfile.binary
+          file: ./Dockerfile.alpine
           platforms: ${{ env.BUILD_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |

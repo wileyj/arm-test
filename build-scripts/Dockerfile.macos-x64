@@ -1,9 +1,8 @@
 FROM rust:bullseye as build
 
-ARG OS_ARCH=macos-macos-x64
+ARG STACKS_NODE_VERSION="No Version Info"
 ARG GIT_BRANCH='No Branch Info'
 ARG GIT_COMMIT='No Commit Info'
-# ENV OS_ARCH=${OS_ARCH}
 
 WORKDIR /src
 

@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} alpine as builder
+FROM --platform=${TARGETPLATFORM} bullseye as builder
 
 ARG TAG
 ARG BIN_ARCH
@@ -8,14 +8,13 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 
 RUN case ${TARGETARCH} in \
-    "amd64")  BIN_ARCH=linux-x64  ;; \
-    "arm64")  BIN_ARCH=linux-arm64  ;; \
-    "arm")    BIN_ARCH=linux-arm${TARGETVARIANT}  ;; \
+    "amd64")  BIN_ARCH=linux-glibc-x64  ;; \
+    "arm64")  BIN_ARCH=linux-glibc-arm64  ;; \
     esac \
     && echo "wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip" \
     && wget  -q https://github.com/wileyj/arm-test/releases/download/${TAG}/${BIN_ARCH}.zip -O /${BIN_ARCH}.zip \
     && unzip ${BIN_ARCH}.zip -d /out
 
-FROM --platform=${TARGETPLATFORM} alpine
+FROM --platform=${TARGETPLATFORM} bullseye
 COPY --from=builder /out/ /bin/
 CMD ["/bin/rusty-blockparser"]
