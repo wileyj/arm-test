@@ -24,7 +24,7 @@ jobs:
 
   create-release:
     uses: wileyj/arm-test/.github/workflows/release.yml@master
-    # needs: dist
+    needs: dist
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
@@ -32,7 +32,7 @@ jobs:
 
   docker:
     uses: wileyj/arm-test/.github/workflows/docker.yml@master
-    # needs: create-release
+    needs: create-release
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:

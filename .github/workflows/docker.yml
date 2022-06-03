@@ -18,7 +18,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    needs: upload-dist
+    # needs: upload-dist
 
     steps:
       - uses: actions/checkout@v2
