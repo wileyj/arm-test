@@ -10,7 +10,7 @@ on:
       GH_TOKEN:
         required: true
 jobs:
-  distributables:
+  assets:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
