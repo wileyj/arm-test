@@ -1,4 +1,4 @@
-FROM rust:alpine as build
+FROM messense/rust-musl-cross:aarch64-musl as build
 
 ARG STACKS_NODE_VERSION="No Version Info"
 ARG GIT_BRANCH='No Branch Info'
@@ -8,16 +8,39 @@ WORKDIR /src
 
 COPY . .
 
+RUN rustup update stable
+
+RUN apt-get update && apt-get install -y git
+
 RUN rustup target add aarch64-unknown-linux-musl
 
-RUN apk update && apk add git musl-dev
-
-RUN CC=aarch64-linux-musl-gcc \
-    CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
-    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-musl-gcc \
-    cargo build --release --workspace --target aarch64-unknown-linux-musl
+RUN cargo build --release --workspace --target aarch64-unknown-linux-musl
 
 RUN mkdir /out && cp -R /src/target/aarch64-unknown-linux-musl/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser /
+
+# FROM rust:alpine as build
+
+# ARG STACKS_NODE_VERSION="No Version Info"
+# ARG GIT_BRANCH='No Branch Info'
+# ARG GIT_COMMIT='No Commit Info'
+
+# WORKDIR /src
+
+# COPY . .
+
+# RUN apk update && apk add git musl-dev
+
+# RUN rustup target add aarch64-unknown-linux-musl
+
+# RUN CC=aarch64-linux-musl-gcc \
+#     CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
+#     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-musl-gcc \
+#     cargo build --release --workspace --target aarch64-unknown-linux-musl
+
+# RUN mkdir /out && cp -R /src/target/aarch64-unknown-linux-musl/release/. /out
+
+# FROM scratch AS export-stage
+# COPY --from=build /out/rusty-blockparser /
