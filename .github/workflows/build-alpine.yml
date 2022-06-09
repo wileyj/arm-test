@@ -17,7 +17,7 @@ env:
 jobs:
   latest-tag:
     # if: ${{ github.event.inputs.tag != '' }}
-    if: ${{ github.event.inputs.tag != '' && (github.ref != 'refs/heads/master) }}
+    if: ${{ github.event.inputs.tag != '' && (github.ref != 'refs/heads/master' ) }}
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.latest-tag.outputs.image_tag }}
