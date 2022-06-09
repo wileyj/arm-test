@@ -36,12 +36,12 @@ jobs:
           if [[ -z ${TAG} ]]; then
               REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
               if [[ "${REF}" == "master" ]]; then
-                  echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+                  echo "IMAGE_TAG=latest-alpine" >> $GITHUB_ENV
               else
-                  echo "IMAGE_TAG=${REF}" >> $GITHUB_ENV
+                  echo "IMAGE_TAG=${REF}-alpine" >> $GITHUB_ENV
               fi
           else
-              echo "IMAGE_TAG=${TAG}" >> $GITHUB_ENV
+              echo "IMAGE_TAG=${TAG}-alpine" >> $GITHUB_ENV
           fi
         env:
           TAG: ${{ github.event.inputs.tag }}
