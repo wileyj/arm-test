@@ -12,7 +12,8 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64
+  # BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64
+  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
 
 jobs:
   latest-tag:
