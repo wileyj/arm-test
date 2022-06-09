@@ -32,20 +32,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Determine Latest Debian Tag
-        run: |
-          if [[ -z ${TAG} ]]; then
-              REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
-              if [[ "${REF}" == "master" ]]; then
-                  echo "IMAGE_TAG=latest-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
-              else
-                  echo "IMAGE_TAG=${REF}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
-              fi
-          else
-              echo "IMAGE_TAG=${TAG}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
-          fi
-        env:
-          TAG: ${{ github.event.inputs.tag }}
+      # - name: Determine Latest Debian Tag
+      #   run: |
+      #     if [[ -z ${TAG} ]]; then
+      #         REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
+      #         if [[ "${REF}" == "master" ]]; then
+      #             echo "IMAGE_TAG=latest-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
+      #         else
+      #             echo "IMAGE_TAG=${REF}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
+      #         fi
+      #     else
+      #         echo "IMAGE_TAG=${TAG}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
+      #     fi
+      #   env:
+      #     TAG: ${{ github.event.inputs.tag }}
 
       - name: Docker meta
         id: meta
@@ -56,7 +56,8 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            ${{ env.IMAGE_TAG }}
+            type=raw,value=latest-${{ env.DEBIAN_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+            type=raw,value=${{ github.event.inputs.tag }}-${{ env.DEBIAN_VERSION }},enable=${{ github.event.inputs.tag != '' }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
