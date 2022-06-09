@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM} bullseye as builder
+FROM --platform=${TARGETPLATFORM} debian:bullseye as builder
 
 ARG TAG
 ARG BIN_ARCH
