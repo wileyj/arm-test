@@ -31,13 +31,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Determine Latest Tag
+      - name: Determine Latest Alpine Tag
         run: |
-          if [[ -z ${{ github.event.inputs.tag }} ]]; then
+          if [[ -z ${TAG} ]]; then
               REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
               if [[ "${REF}" == "master" ]]; then
-                  echo "IMAGE_TAG=latest-alpine" >> $GITHUB_ENV
+                  echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+              else
+                  echo "IMAGE_TAG=${REF}" >> $GITHUB_ENV
               fi
+          else
+              echo "IMAGE_TAG=${TAG}" >> $GITHUB_ENV
           fi
         env:
           TAG: ${{ github.event.inputs.tag }}
