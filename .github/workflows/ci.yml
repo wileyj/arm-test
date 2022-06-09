@@ -41,12 +41,12 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  # build-bullseye:
-  #   if: ${{ github.event.inputs.tag != '' }}
-  #   uses: wileyj/arm-test/.github/workflows/build-bullseye.yml@master
-  #   needs: gh-release
-  #   with:
-  #     tag: ${{ github.event.inputs.tag }}
-  #   secrets:
-  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-  #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  build-bullseye:
+    if: ${{ github.event.inputs.tag != '' }}
+    uses: wileyj/arm-test/.github/workflows/build-bullseye.yml@master
+    needs: gh-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

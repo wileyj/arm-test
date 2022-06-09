@@ -13,6 +13,7 @@ on:
         required: true
 env:
   BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/arm64
+  DEBIAN_VERSION: bullseye
 
 jobs:
   images:
@@ -31,17 +32,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Determine Bullseye Tag
+      - name: Determine Debian Tag
         run: |
           if [[ -z ${TAG} ]]; then
               REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
               if [[ "${REF}" == "master" ]]; then
-                  echo "BULLSEYE_TAG=latest-bullseye" >> $GITHUB_ENV
+                  echo "DEBIAN_TAG=latest-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
               else
-                  echo "BULLSEYE_TAG=${REF}-bullseye" >> $GITHUB_ENV
+                  echo "DEBIAN_TAG=${REF}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
               fi
           else
-              echo "BULLSEYE_TAG=${TAG}-bullseye" >> $GITHUB_ENV
+              echo "DEBIAN_TAG=${TAG}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
           fi
 
       - name: Docker meta
@@ -53,7 +54,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            ${{ env.BULLSEYE_TAG }}
+            ${{ env.DEBIAN_TAG }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
