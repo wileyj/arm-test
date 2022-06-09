@@ -49,7 +49,7 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=semver,pattern=${{ github.event.inputs.tag }}
+            ${{ github.event.inputs.tag }}
             type=ref,event=branch
             type=ref,event=pr
 
