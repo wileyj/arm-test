@@ -53,10 +53,9 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=semver,pattern=${{ github.event.inputs.tag }}
             type=ref,event=branch
             type=ref,event=pr
-            latest
+            ${{ github.event.inputs.tag }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
