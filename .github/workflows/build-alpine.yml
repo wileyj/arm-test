@@ -32,15 +32,16 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Determine Latest Alpine Tag
-        run: |
-          if [[ -z ${TAG} ]]; then
-              REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
-              if [[ "${REF}" == "master" ]]; then
-                  echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-              fi
-          fi
-        env:
-          TAG: ${{ github.event.inputs.tag }}
+        if: ${{ github.event.inputs.tag != '' }}
+        outputs:
+          tag: latest
+        # run: |
+        #   REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
+        #   if [[ "${REF}" == "master" ]]; then
+        #       echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+        #   fi
+        # env:
+        #   TAG: ${{ github.event.inputs.tag }}
 
       - name: Docker meta
         id: meta
@@ -49,7 +50,7 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            ${{ github.event.inputs.tag }}
+            type=semver,pattern=${{ github.event.inputs.tag }}
             ${{ env.IMAGE_TAG }}
             type=ref,event=branch
             type=ref,event=pr
