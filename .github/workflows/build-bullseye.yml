@@ -32,7 +32,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Determine Debian Tag
+      - name: Determine Latest Tag
         run: |
           if [[ -z ${TAG} ]]; then
               REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
@@ -44,6 +44,8 @@ jobs:
           else
               echo "IMAGE_TAG=${TAG}-${{ env.DEBIAN_VERSION }}" >> $GITHUB_ENV
           fi
+        env:
+          TAG: ${{ github.event.inputs.tag }}
 
       - name: Docker meta
         id: meta
