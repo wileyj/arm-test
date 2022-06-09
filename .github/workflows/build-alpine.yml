@@ -35,11 +35,11 @@ jobs:
         if: ${{ github.event.inputs.tag != '' }}
         outputs:
           tag: latest
-        # run: |
-        #   REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
-        #   if [[ "${REF}" == "master" ]]; then
-        #       echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-        #   fi
+        run: |
+          REF=$(echo ${GITHUB_REF#refs/*/} | tr / -)
+          if [[ "${REF}" == "master" ]]; then
+              echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          fi
         # env:
         #   TAG: ${{ github.event.inputs.tag }}
 
