@@ -50,6 +50,7 @@ jobs:
             wileyj/${{ github.event.repository.name }}
           tags: |
             ${{ github.event.inputs.tag }}
+            ${{ env.IMAGE_TAG }}
             type=ref,event=branch
             type=ref,event=pr
 
