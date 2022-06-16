@@ -2,18 +2,16 @@ name: Docker Tagged Release
 
 on:
   pull_request:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       tag:
         required: true
         type: string
-    # secrets:
-    #   DOCKERHUB_USERNAME:
-    #     required: true
-    #   DOCKERHUB_PASSWORD:
-    #     required: true
-    #   GH_TOKEN:
-    #     required: true
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_PASSWORD:
+        required: true
 
 concurrency:
   group: arm-test-${{ github.ref }}
