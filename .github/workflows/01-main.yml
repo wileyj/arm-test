@@ -37,21 +37,19 @@ jobs:
     # secrets:
     #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
     # Only run if (a tag was passed in and we're building a master branch) and (this isn't a PR)
-    if: ${{ (github.event.inputs.tag != '' && github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
+    if: ${{ (github.event.inputs.tag != '' }}
+    # && github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
     runs-on: ubuntu-latest
     steps:
       - name: vals
         run: |
           echo "Build images from binaries"
           echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
-          echo "Tag was passed in 
-          echo "-AND- 
-          echo "this is the master branch"
-          echo "-AND-"
-          echo "  this isn't a PR"
+          echo "Tag was passed in"
   build-branch:
     # Only run if (a tag was NOT passed in) and (we're building a non-master branch which isn't a PR)
-    if: ${{ github.event.inputs.tag == '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ github.event.inputs.tag == '' }}
+    # || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
       - name: vals
@@ -60,10 +58,6 @@ jobs:
           echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "Tag was not passed in"
-          echo "-OR-"
-          echo "  this is a non-master branch"
-          echo "  -AND-"
-          echo "  this isn't a PR"
 
   # github-release:
   #   # if: ${{ github.event.inputs.tag != '' }}
