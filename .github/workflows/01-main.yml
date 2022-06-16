@@ -19,10 +19,10 @@ on:
 #         description: "The tag to create (optional)"
 #         required: false
 
-concurrency:
-  group: arm-test-${{ github.ref }}
-  # Only cancel in progress if this is for a PR
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+# concurrency:
+#   group: arm-test-${{ github.ref }}
+#   # Only cancel in progress if this is for a PR
+#   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ########################################################################
@@ -37,20 +37,20 @@ jobs:
     # secrets:
     #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
     # Only run if (a tag was passed in and we're building a master branch) and (this isn't a PR)
-    if: ${{ (github.event.inputs.tag != '' && github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
       - name: vals
         run: |
           echo "Build images from binaries"
           echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
-          echo "Tag was passed in 
-          echo "-AND- 
-          echo "this is the master branch"
-          echo "-AND-"
-          echo "  this isn't a PR"
+          echo "github.event.inputs.tag != ''"
+          echo "-OR-"
+          echo "github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull'))"
   build-branch:
     # Only run if (a tag was NOT passed in) and (we're building a non-master branch which isn't a PR)
+    # if: ${{ github.event.inputs.tag == '' }}
     if: ${{ github.event.inputs.tag == '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
@@ -59,12 +59,9 @@ jobs:
           echo "Build images from source"
           echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
-          echo "Tag was not passed in"
+          echo "github.event.inputs.tag == ''"
           echo "-OR-"
-          echo "  this is a non-master branch"
-          echo "  -AND-"
-          echo "  this isn't a PR"
-
+          echo "github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull'))"
   # github-release:
   #   # if: ${{ github.event.inputs.tag != '' }}
   #   if: ${{ (github.event.inputs.tag != '' || github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
