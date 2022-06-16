@@ -28,12 +28,24 @@ jobs:
     #   tag: ${{ github.event.inputs.tag }}
     # secrets:
     #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    if: ${{ !contains(github.ref, 'refs/pull') && (github.event.inputs.tag != '' && github.ref == 'refs/heads/master') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: vals
+        run: |
+          echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
+          echo "This is NOT a PR -AND-"
+          echo "  provided input is not empty -AND- this is the master branch"
+  build-branch:
+    if: ${{ contains(github.ref, 'refs/pull') || (github.event.inputs.tag == '' && github.ref != 'refs/heads/master') }}
     runs-on: ubuntu-latest
     steps:
       - name: vals
         run: |
           echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
+          echo "This is a PR -OR-"
+          echo "  provided input is empty -AND- this is not the master branch"
 
   # github-release:
   #   # if: ${{ github.event.inputs.tag != '' }}
@@ -67,10 +79,11 @@ jobs:
   #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#   ########################################################################
-#   ## Build Branch
-#   ########################################################################
-#   build-branch:
+  #   ########################################################################
+  #   ## Build Branch
+  #   ########################################################################
+
+#  build-branch:
 #     # Only run if:
 #     #   - a tag was not supplied
 #     #   - building a non-master branch which isn't a PR
@@ -85,4 +98,3 @@ jobs:
 # # # for pull requests it is: refs/pull/<pr_number>/merge
 # # # and for tags it is: refs/tags/<tag_name>
 # # # For example, refs/heads/feature-branch-1.
-
