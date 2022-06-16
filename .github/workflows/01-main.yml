@@ -72,7 +72,6 @@ jobs:
     # startsWith(github.ref, 'refs/tags/')
     uses: wileyj/arm-test/.github/workflows/02-build-branch.yml@master
     secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 # # The ref given is fully-formed, meaning that
