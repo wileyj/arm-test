@@ -1,0 +1,65 @@
+name: Docker Tagged Release
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        type: string
+    # secrets:
+    #   DOCKERHUB_USERNAME:
+    #     required: true
+    #   DOCKERHUB_PASSWORD:
+    #     required: true
+    #   GH_TOKEN:
+    #     required: true
+
+concurrency:
+  group: arm-test-${{ github.ref }}
+  # Only cancel in progress if this is for a PR
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  # create new file for tagged release using binaries
+  # and a second file for PR releases with no tag that doesn't use binaries (debian/alpine x86 only)
+  build-source:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/tag-release/build-source.yml@master
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  github-release:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/tag-release/github-release.yml@master
+    needs: build-source
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  alpine-image:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/tag-release/alpine-image.yml@master
+    needs: github-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  debian-image:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/tag-release/debian-image.yml@master
+    needs: github-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
