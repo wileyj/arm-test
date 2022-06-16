@@ -17,20 +17,53 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build-release:
-    # Only run if:
-    #   - a tag was supplied
-    #   - building a master branch which isn't a PR
-    if: ${{ github.event.inputs.tag != '' && (github.ref == 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    # startsWith(github.ref, 'refs/tags/')
-    uses: wileyj/arm-test/.github/workflows/02-build-release.yml@master
+  ########################################################################
+  ## Build Tagged Release
+  ########################################################################
+  build-source:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  github-release:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
+    needs: build-source
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+  alpine-image:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
+    needs: github-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+  debian-image:
+    # if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
+    needs: github-release
+    with:
+      tag: ${{ github.event.inputs.tag }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  ########################################################################
+  ## Build Branch
+  ########################################################################
   build-branch:
     # Only run if:
     #   - a tag was not supplied
@@ -42,9 +75,9 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-# The ref given is fully-formed, meaning that
-# for branches the format images: refs/heads/<branch_name>
-# for pull requests it is: refs/pull/<pr_number>/merge
-# and for tags it is: refs/tags/<tag_name>
-# For example, refs/heads/feature-branch-1.
+# # The ref given is fully-formed, meaning that
+# # for branches the format images: refs/heads/<branch_name>
+# # for pull requests it is: refs/pull/<pr_number>/merge
+# # and for tags it is: refs/tags/<tag_name>
+# # For example, refs/heads/feature-branch-1.
 
