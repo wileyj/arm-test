@@ -26,7 +26,7 @@ jobs:
   build-source:
     # if: ${{ github.event.inputs.tag != '' }}
     if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/tag-release/build-source.yml@master
+    uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
@@ -35,7 +35,7 @@ jobs:
   github-release:
     # if: ${{ github.event.inputs.tag != '' }}
     if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/tag-release/github-release.yml@master
+    uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
     needs: build-source
     with:
       tag: ${{ github.event.inputs.tag }}
@@ -45,7 +45,7 @@ jobs:
   alpine-image:
     # if: ${{ github.event.inputs.tag != '' }}
     if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/tag-release/alpine-image.yml@master
+    uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
@@ -56,7 +56,7 @@ jobs:
   debian-image:
     # if: ${{ github.event.inputs.tag != '' }}
     if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/tag-release/debian-image.yml@master
+    uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
