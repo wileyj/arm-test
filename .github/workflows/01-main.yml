@@ -28,8 +28,8 @@ jobs:
     #   tag: ${{ github.event.inputs.tag }}
     # secrets:
     #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
-    # if: ${{ !contains(github.ref, 'refs/pull') && (github.event.inputs.tag != '' && github.ref == 'refs/heads/master') }}
     # Only push if (a tag was passed in) or (we're building a non-master branch which isn't a PR)
+    # if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +41,8 @@ jobs:
           echo "  non-master branch which isn't a PR"
   build-branch:
     # if: ${{ contains(github.ref, 'refs/pull') || (github.event.inputs.tag == '' && github.ref != 'refs/heads/master') }}
-    if: ${{ github.event.inputs.tag == '' && (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    # if: ${{ github.event.inputs.tag == '' && (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
       - name: vals
