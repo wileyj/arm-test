@@ -60,23 +60,22 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  ########################################################################
-  ## Build Branch
-  ########################################################################
-  build-branch:
-    # Only run if:
-    #   - a tag was not supplied
-    #   - building a non-master branch which isn't a PR
-    if: ${{ github.event.inputs.tag == '' && (github.ref != 'refs/heads/master' || !contains(github.ref, 'refs/pull')) }}
-    # startsWith(github.ref, 'refs/tags/')
-    uses: wileyj/arm-test/.github/workflows/02-build-branch.yml@master
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-# # The ref given is fully-formed, meaning that
-# # for branches the format images: refs/heads/<branch_name>
-# # for pull requests it is: refs/pull/<pr_number>/merge
-# # and for tags it is: refs/tags/<tag_name>
-# # For example, refs/heads/feature-branch-1.
+#   ########################################################################
+#   ## Build Branch
+#   ########################################################################
+#   build-branch:
+#     # Only run if:
+#     #   - a tag was not supplied
+#     #   - building a non-master branch which isn't a PR
+#     if: ${{ github.event.inputs.tag == '' && (github.ref != 'refs/heads/master' || !contains(github.ref, 'refs/pull')) }}
+#     # startsWith(github.ref, 'refs/tags/')
+#     uses: wileyj/arm-test/.github/workflows/02-build-branch.yml@master
+#     secrets:
+#       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+# # # The ref given is fully-formed, meaning that
+# # # for branches the format images: refs/heads/<branch_name>
+# # # for pull requests it is: refs/pull/<pr_number>/merge
+# # # and for tags it is: refs/tags/<tag_name>
+# # # For example, refs/heads/feature-branch-1.
 
