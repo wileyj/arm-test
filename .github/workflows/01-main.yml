@@ -21,45 +21,51 @@ jobs:
   ## Build Tagged Release
   ########################################################################
   build-source:
-    # if: ${{ github.event.inputs.tag != '' }}
-    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    # # if: ${{ github.event.inputs.tag != '' }}
+    # if: ${{ (github.event.inputs.tag != '' || github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
+    # uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
+    # with:
+    #   tag: ${{ github.event.inputs.tag }}
+    # secrets:
+    #   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: vals
+        run: |
+          echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
 
-  github-release:
-    # if: ${{ github.event.inputs.tag != '' }}
-    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
-    needs: build-source
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  # github-release:
+  #   # if: ${{ github.event.inputs.tag != '' }}
+  #   if: ${{ (github.event.inputs.tag != '' || github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
+  #   uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
+  #   needs: build-source
+  #   with:
+  #     tag: ${{ github.event.inputs.tag }}
+  #   secrets:
+  #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  alpine-image:
-    # if: ${{ github.event.inputs.tag != '' }}
-    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
-    needs: github-release
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  # alpine-image:
+  #   # if: ${{ github.event.inputs.tag != '' }}
+  #   if: ${{ (github.event.inputs.tag != '' || github.ref == 'refs/heads/master') && !contains(github.ref, 'refs/pull') }}
+  #   uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
+  #   needs: github-release
+  #   with:
+  #     tag: ${{ github.event.inputs.tag }}
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  debian-image:
-    # if: ${{ github.event.inputs.tag != '' }}
-    if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
-    needs: github-release
-    with:
-      tag: ${{ github.event.inputs.tag }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  # debian-image:
+  #   # if: ${{ github.event.inputs.tag != '' }}
+  #   if: ${{ github.event.inputs.tag != '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
+  #   uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
+  #   needs: github-release
+  #   with:
+  #     tag: ${{ github.event.inputs.tag }}
+  #   secrets:
+  #     DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  #     DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
 #   ########################################################################
 #   ## Build Branch
 #   ########################################################################
