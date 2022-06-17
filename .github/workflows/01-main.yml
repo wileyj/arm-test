@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push:
+    tags:
+      - "**" # match all tag names
   pull_request:
   workflow_dispatch:
     inputs:
@@ -50,7 +53,7 @@ jobs:
           echo "-OR-"
           echo "github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull'))"
   build-branch:
-    # Only run if (a tag was NOT passed in) and (we're building a non-master branch which isn't a PR)
+    # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     # if: ${{ github.event.inputs.tag == '' }}
     if: ${{ github.event.inputs.tag == '' || (github.ref != 'refs/heads/master' && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
