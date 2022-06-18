@@ -14,7 +14,7 @@ on:
 env:
   BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
   # BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
-  DEBIAN_VERSION: bullseye
+  LINUX_VERSION: debian
 
 jobs:
   images:
@@ -44,11 +44,11 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+            type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
+            type=raw,value=${GITHUB_REF##*/}-${{ env.LINUX_VERSION }}
+            # type=raw,value=${GITHUB_REF##*/}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
             type=ref,event=pr
-            type=raw,value=latest-${{ env.DEBIAN_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
-            type=raw,value=${{ github.event.inputs.tag }}-${{ env.DEBIAN_VERSION }},enable=${{ github.event.inputs.tag != '' }}
-
       - name: Login to DockerHub
         if: ${{ github.event.inputs.tag != '' }}
         uses: docker/login-action@v2
