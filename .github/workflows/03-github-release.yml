@@ -11,6 +11,7 @@ on:
         required: true
 jobs:
   create:
+    if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -27,6 +28,7 @@ jobs:
           prerelease: true
 
   upload:
+    if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
     needs: create
     strategy:
@@ -34,9 +36,10 @@ jobs:
       matrix:
         platform:
           - linux-glibc-x64
-          - linux-glibc-arm64
           - linux-musl-x64
-          - linux-musl-arm64
+          # - linux-glibc-arm64
+          # - linux-musl-arm64
+          #
           # - macos-x64
           # - macos-arm64
           # - windows-x64
