@@ -46,8 +46,8 @@ jobs:
           tags: |
             type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
             type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
-            type=raw,value=${GITHUB_REF##*/}-${{ env.LINUX_VERSION }}
-            # type=raw,value=${GITHUB_REF##*/}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+            type=raw,value=${{ env.GITHUB_REF_NAME }}-${{ env.LINUX_VERSION }}
+            # type=raw,value=${{ env.GITHUB_REF_NAME }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
             type=ref,event=pr
       - name: Login to DockerHub
         if: ${{ github.event.inputs.tag != '' }}
