@@ -72,19 +72,15 @@ jobs:
     if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
-      # if no PR, use extraxted branch name
-      # if PR,
+      # extract branch name NOT a pull request
       - name: Extract branch name
-        shell: bash
-        # run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        # run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/})"
+        if: ${{ github.event_name != 'pull_request' }}
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
         id: extract_branch
 
       # extract branch name on pull request
       - name: PR branch name
-        if: github.event_name == 'pull_request'
-        # run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_HEAD_REF})"
+        if: ${{ github.event_name == 'pull_request' }}
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
       - name: vals
