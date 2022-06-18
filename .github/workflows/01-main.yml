@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    tags:
-      - "**" # match all tag names
+  # push:
+  #   tags:
+  #     - "**" # match all tag names
   pull_request:
   workflow_dispatch:
     inputs:
@@ -32,14 +32,14 @@ jobs:
   ## Build Tagged Release
   ########################################################################
   build-source:
-    # Only run if (a tag was passed in) or (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
+    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
   github-release:
-    # Only run if (a tag was passed in) or (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
+    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
     needs: build-source
     with:
@@ -47,28 +47,28 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
   alpine-image:
-    # Only run if (a tag was passed in) or (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
+    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-    # secrets:
-    #   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-    #   DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
   debian-image:
-    # Only run if (a tag was passed in) or (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
+    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-    # secrets:
-    #   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-    #   DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   build-branch:
-    # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
+    # Only run if (a tag was NOT passed in) -OR- (we're building a non-master branch which isn't a PR)
     if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
     steps:
