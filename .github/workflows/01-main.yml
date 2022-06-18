@@ -98,7 +98,7 @@ jobs:
   build-branch:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/02-build-branch.yml@master
+    uses: wileyj/arm-test/.github/workflows/02-build-branch.yml
 # runs-on: ubuntu-latest
 # steps:
 #   - name: vals
