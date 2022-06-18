@@ -22,4 +22,4 @@ RUN . /opt/osxcross/env-macos-x86_64 && \
 RUN mkdir /out && cp -R /src/target/x86_64-apple-darwin/release/. /out
 
 FROM scratch AS export-stage
-COPY --from=build /out/rusty-blockparser /
+COPY --from=build /out/rusty-blockparser* /
