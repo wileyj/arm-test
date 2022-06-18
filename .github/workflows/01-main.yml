@@ -83,6 +83,7 @@ jobs:
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
           echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
           echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
           echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
           echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
