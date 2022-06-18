@@ -70,7 +70,7 @@ jobs:
         if: ${{ github.event.inputs.tag != '' }}
         uses: docker/build-push-action@v3
         with:
-          file: ./Dockerfile.debian
+          file: ./Dockerfile.debian-binary
           platforms: ${{ env.BUILD_PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
