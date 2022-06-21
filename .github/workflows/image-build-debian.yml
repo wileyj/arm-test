@@ -6,15 +6,21 @@ on:
       tag:
         required: true
         type: string
+      build_platforms:
+        required: true
+        type: string
+      linux_version:
+        required: true
+        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
 
-env:
-  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
-  LINUX_VERSION: debian
+# env:
+#   BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
+#   LINUX_VERSION: debian
 
 jobs:
   images:

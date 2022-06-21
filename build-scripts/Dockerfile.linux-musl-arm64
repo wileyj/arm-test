@@ -9,13 +9,14 @@ WORKDIR /src
 
 COPY . .
 
-RUN rustup update stable
-
 RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
+    && cd ${BUILD_DIR} \
+    && rustup update stable \
     && rustup target add aarch64-unknown-linux-musl \
-    && cargo build --release --workspace --target aarch64-unknown-linux-musl
+    && cargo build --release --workspace --target aarch64-unknown-linux-musl \
+    && mkdir /out \
+    && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-musl/release/. /out
 
-RUN mkdir /out && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-musl/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser /

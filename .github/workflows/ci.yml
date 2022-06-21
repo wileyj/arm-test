@@ -11,6 +11,11 @@ on:
         description: "The tag to create (optional)"
         required: false
 
+env:
+  build_platforms: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
+  debian_platform: linux/amd64
+  linux_version: debian
+
 concurrency:
   group: arm-test-${{ github.ref }}
   # Only cancel in progress if this is for a PR
@@ -41,11 +46,10 @@ jobs:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
-    env:
-      BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
+      build_platform: ${{ env.build_platforms }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -54,12 +58,11 @@ jobs:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
-    env:
-      BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
-      LINUX_VERSION: debian
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
+      build_platforms: ${{ env.build_platforms }}
+      linux_version: ${{ env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -71,9 +74,9 @@ jobs:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
-    env:
-      BUILD_PLATFORMS: linux/amd64
-      LINUX_VERSION: debian
+    with:
+      build_platforms: ${{ env.debian_platforms }}
+      linux_version: ${{ env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

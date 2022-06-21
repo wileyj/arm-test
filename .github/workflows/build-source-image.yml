@@ -2,6 +2,13 @@ name: Build Source Debian
 
 on:
   workflow_call:
+    inputs:
+      build_platforms:
+        required: true
+        type: string
+      linux_version:
+        required: true
+        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true

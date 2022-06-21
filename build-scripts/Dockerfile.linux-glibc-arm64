@@ -12,11 +12,12 @@ COPY . .
 RUN apt-get update && apt-get install -y git gcc-aarch64-linux-gnu
 
 RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
-    && rustup target add aarch64-unknown-linux-musl \
+    && cd ${BUILD_DIR} \
+    && rustup target add aarch64-unknown-linux-gnu \
     && CC=aarch64-linux-gnu-gcc \
-    CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc \
-    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc \
-    cargo build --release --workspace --target aarch64-unknown-linux-musl
+    CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
+    cargo build --release --workspace --target aarch64-unknown-linux-gnu
 
 RUN mkdir /out && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-gnu/release/. /out
 
