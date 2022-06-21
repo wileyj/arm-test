@@ -49,7 +49,7 @@ jobs:
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-      build_platform: ${{ env.build_platforms }}
+      build_platform: ${{ github.env.build_platforms }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -61,8 +61,8 @@ jobs:
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-      build_platforms: ${{ env.build_platforms }}
-      linux_version: ${{ env.linux_version }}
+      build_platforms: ${{ github.env.build_platforms }}
+      linux_version: ${{ github.env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -75,8 +75,8 @@ jobs:
     if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
     with:
-      build_platforms: ${{ env.debian_platforms }}
-      linux_version: ${{ env.linux_version }}
+      build_platforms: ${{ github.env.debian_platforms }}
+      linux_version: ${{ github.env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

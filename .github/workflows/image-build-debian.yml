@@ -18,9 +18,9 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 
-# env:
-#   BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
-#   LINUX_VERSION: debian
+env:
+  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
+  LINUX_VERSION: debian
 
 jobs:
   images:
@@ -42,7 +42,7 @@ jobs:
         if: ${{ github.event.inputs.tag != '' }}
         uses: docker/setup-buildx-action@v2
 
-        # extract branch name NOT a pull request
+      # extract branch name NOT a pull request
       - name: Extract branch name
         if: ${{ github.event_name != 'pull_request' }}
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
@@ -53,6 +53,19 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
+      # - name: Docker meta
+      #   if: ${{ github.event.inputs.tag != '' }}
+      #   id: meta
+      #   uses: docker/metadata-action@v4
+      #   with:
+      #     images: |
+      #       wileyj/${{ github.event.repository.name }}
+      #     tags: |
+      #       type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+      #       type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
+      #       type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
+      #       type=ref,event=pr
+
       - name: Docker meta
         if: ${{ github.event.inputs.tag != '' }}
         id: meta
@@ -61,9 +74,9 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
-            type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
-            type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
+            type=raw,value=latest-${{ github.event.inputs.linux_version }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+            type=raw,value=${{ github.event.inputs.tag }}-${{ github.event.inputs.linux_version }},enable=${{ github.event.inputs.tag != '' }}
+            type=raw,value=${{ env.BRANCH_NAME }}-${{ github.event.inputs.linux_version }}
             type=ref,event=pr
 
       - name: Login to DockerHub
@@ -78,7 +91,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.debian-binary
-          platforms: ${{ env.BUILD_PLATFORMS }}
+          # platforms: ${{ env.BUILD_PLATFORMS }}
+          platforms: ${{ github.event.inputs.build_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

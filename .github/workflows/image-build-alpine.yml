@@ -15,8 +15,8 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 
-# env:
-#   BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
+env:
+  BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
 
 jobs:
   images:
@@ -64,7 +64,8 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.alpine-binary
-          platforms: ${{ env.BUILD_PLATFORMS }}
+          # platforms: ${{ env.BUILD_PLATFORMS }}
+          platforms: ${{ github.event.input.build_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
