@@ -11,21 +11,14 @@ on:
         description: "The tag to create (optional)"
         required: false
 
-# on:
-#   push:
-#     tags:
-#       - "**" # match all tag names
-#   pull_request:
-#   workflow_dispatch:
-#     inputs:
-#       tag:
-#         description: "The tag to create (optional)"
-#         required: false
+env:
+  BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
+  LINUX_VERSION: debian
 
-# concurrency:
-#   group: arm-test-${{ github.ref }}
-#   # Only cancel in progress if this is for a PR
-#   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+concurrency:
+  group: arm-test-${{ github.ref }}
+  # Only cancel in progress if this is for a PR
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   ########################################################################
@@ -34,35 +27,55 @@ jobs:
   build-source:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-build-source.yml@master
+    uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     with:
       tag: ${{ github.event.inputs.tag }}
+
   github-release:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-github-release.yml@master
+    uses: wileyj/arm-test/.github/workflows/github-release.yml@master
     needs: build-source
     with:
       tag: ${{ github.event.inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
   alpine-image:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-alpine-image.yml@master
+    uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
+      BUILD_PLATFORMS: ${{ env.BUILD_PLATFORMS }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
   debian-image:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/03-debian-image.yml@master
+    uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
+      BUILD_PLATFORMS: ${{ env.BUILD_PLATFORMS }}
+      LINUX_VERSION: ${{ env.LINUX_VERSION }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  ########################################################################
+  ## Build Branch/PR
+  ########################################################################
+  build-branch:
+    # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
+    if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
+    with:
+      BUILD_PLATFORMS: ${{ env.BUILD_PLATFORMS }}
+      LINUX_VERSION: ${{ env.LINUX_VERSION }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -77,12 +90,12 @@ jobs:
   #       if: ${{ github.event_name != 'pull_request' }}
   #       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
   #       id: extract_branch
-
+  #
   #     # extract branch name on pull request
   #     - name: PR branch name
   #       if: ${{ github.event_name == 'pull_request' }}
   #       run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
-
+  #
   #     - name: vals
   #       run: |
   #         echo "Build images from source"
@@ -95,17 +108,3 @@ jobs:
   #         echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
   #         echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
   #         echo "Branch Name: ${{ env.BRANCH_NAME }}"
-  build-branch:
-    # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
-    if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    uses: wileyj/arm-test/.github/workflows/02-build-branch.yml@master
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-# runs-on: ubuntu-latest
-# steps:
-#   - name: vals
-#     run: |
-#       echo "Build images from binaries"
-#       echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
-#       echo "github.ref: ${{ github.ref }}"

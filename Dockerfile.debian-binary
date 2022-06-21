@@ -1,4 +1,5 @@
 FROM --platform=${TARGETPLATFORM} alpine as builder
+# use a small image here since we're just downloading a binary
 
 ARG TAG
 ARG BIN_ARCH

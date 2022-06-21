@@ -3,6 +3,7 @@ FROM rust:bullseye as build
 ARG STACKS_NODE_VERSION="No Version Info"
 ARG GIT_BRANCH='No Branch Info'
 ARG GIT_COMMIT='No Commit Info'
+ENV BUILD_DIR=/build
 
 WORKDIR /src
 
@@ -10,14 +11,14 @@ COPY . .
 
 RUN apt-get update && apt-get install -y git gcc-aarch64-linux-gnu
 
-RUN rustup target add aarch64-unknown-linux-musl
-
-RUN CC=aarch64-linux-gnu-gcc \
+RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
+    && rustup target add aarch64-unknown-linux-musl \
+    && CC=aarch64-linux-gnu-gcc \
     CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc \
     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc \
     cargo build --release --workspace --target aarch64-unknown-linux-musl
 
-RUN mkdir /out && cp -R /src/target/aarch64-unknown-linux-musl/release/. /out
+RUN mkdir /out && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-musl/release/. /out
 
 
 FROM scratch AS export-stage
