@@ -17,11 +17,11 @@ RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     && CC=aarch64-linux-gnu-gcc \
     CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
     CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
-    cargo build --release --workspace --target aarch64-unknown-linux-gnu
-
-RUN ls -al ${BUILD_DIR}/target/
-
-RUN mkdir -p /out \
+    cargo build --release --workspace --target aarch64-unknown-linux-gnu \
+    && pwd \
+    && ls -al \ 
+    && ls -al ${BUILD_DIR}/target/ \
+    && mkdir -p /out \
     && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-gnu/release/. /out
 
 

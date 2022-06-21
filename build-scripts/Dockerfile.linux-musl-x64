@@ -14,11 +14,11 @@ RUN apk update && apk add git musl-dev
 RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     && cd ${BUILD_DIR} \
     && rustup target add x86_64-unknown-linux-musl \
-    && cargo build --release --workspace --target x86_64-unknown-linux-musl
-
-RUN ls -al ${BUILD_DIR}/target/
-
-RUN mkdir -p /out \
+    && cargo build --release --workspace --target x86_64-unknown-linux-musl \
+    && pwd \
+    && ls -al \ 
+    && ls -al ${BUILD_DIR}/target/ \ 
+    && mkdir -p /out \
     && cp -R ${BUILD_DIR}/target/x86_64-unknown-linux-musl/release/. /out
 
 FROM scratch AS export-stage
