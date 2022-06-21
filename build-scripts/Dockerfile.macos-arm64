@@ -20,7 +20,10 @@ RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     && . /opt/osxcross/env-macos-aarch64 \
     && cargo build --target aarch64-apple-darwin --release --workspace
 
-RUN mkdir /out && cp -R ${BUILD_DIR}/target/aarch64-apple-darwin/release/. /out
+RUN ls -al ${BUILD_DIR}/target/
+
+RUN mkdir -p /out \
+    && cp -R ${BUILD_DIR}/target/aarch64-apple-darwin/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser* /

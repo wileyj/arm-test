@@ -18,7 +18,10 @@ RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc \
     cargo build --release --workspace --target x86_64-pc-windows-gnu
 
-RUN mkdir /out && cp -R ${BUILD_DIR}/target/x86_64-pc-windows-gnu/release/. /out
+RUN ls -al ${BUILD_DIR}/target/
+
+RUN mkdir -p /out \
+    && cp -R ${BUILD_DIR}/target/x86_64-pc-windows-gnu/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser* /
