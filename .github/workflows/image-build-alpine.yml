@@ -6,9 +6,6 @@ on:
       tag:
         required: true
         type: string
-      BUILD_PLATFORMS:
-        required: true
-        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
