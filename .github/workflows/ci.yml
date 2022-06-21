@@ -74,7 +74,6 @@ jobs:
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
     with:
       build_platforms: ${{ github.env.debian_platforms }}
-      linux_version: ${{ github.env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
