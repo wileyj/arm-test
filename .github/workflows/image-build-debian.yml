@@ -9,9 +9,6 @@ on:
       build_platforms:
         required: true
         type: string
-      linux_version:
-        required: true
-        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -19,7 +16,7 @@ on:
         required: true
 
 env:
-  BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
+  # BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
   LINUX_VERSION: debian
 
 jobs:
@@ -53,19 +50,6 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
-      # - name: Docker meta
-      #   if: ${{ github.event.inputs.tag != '' }}
-      #   id: meta
-      #   uses: docker/metadata-action@v4
-      #   with:
-      #     images: |
-      #       wileyj/${{ github.event.repository.name }}
-      #     tags: |
-      #       type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
-      #       type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
-      #       type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
-      #       type=ref,event=pr
-
       - name: Docker meta
         if: ${{ github.event.inputs.tag != '' }}
         id: meta
@@ -74,9 +58,9 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=raw,value=latest-${{ github.event.inputs.linux_version }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
-            type=raw,value=${{ github.event.inputs.tag }}-${{ github.event.inputs.linux_version }},enable=${{ github.event.inputs.tag != '' }}
-            type=raw,value=${{ env.BRANCH_NAME }}-${{ github.event.inputs.linux_version }}
+            type=raw,value=latest-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
+            type=raw,value=${{ github.event.inputs.tag }}-${{ env.LINUX_VERSION }},enable=${{ github.event.inputs.tag != '' }}
+            type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
             type=ref,event=pr
 
       - name: Login to DockerHub

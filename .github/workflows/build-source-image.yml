@@ -6,16 +6,12 @@ on:
       build_platforms:
         required: true
         type: string
-      linux_version:
-        required: true
-        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
 env:
-  BUILD_PLATFORMS: linux/amd64
   LINUX_VERSION: debian
 
 concurrency:
@@ -64,7 +60,7 @@ jobs:
       - name: Build/Tag/Push Image
         uses: docker/build-push-action@v2
         with:
-          platforms: ${{ env.BUILD_PLATFORMS }}
+          platforms: ${{ github.event.inputs.build_platforms }}
           file: Dockerfile.debian-source
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

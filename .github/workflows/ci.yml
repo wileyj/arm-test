@@ -13,8 +13,7 @@ on:
 
 env:
   build_platforms: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
-  debian_platform: linux/amd64
-  linux_version: debian
+  debian_platforms: linux/amd64
 
 concurrency:
   group: arm-test-${{ github.ref }}
@@ -49,7 +48,7 @@ jobs:
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-      build_platform: ${{ github.env.build_platforms }}
+      build_platforms: ${{ github.env.build_platforms }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -62,7 +61,6 @@ jobs:
     with:
       tag: ${{ github.event.inputs.tag }}
       build_platforms: ${{ github.env.build_platforms }}
-      linux_version: ${{ github.env.linux_version }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
