@@ -14,9 +14,6 @@ RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     && rustup update stable \
     && rustup target add aarch64-unknown-linux-musl \
     && cargo build --release --workspace --target aarch64-unknown-linux-musl \
-    && pwd \
-    && ls -al \ 
-    && ls -al ${BUILD_DIR}/target/ \ 
     && mkdir -p /out \
     && cp -R ${BUILD_DIR}/target/aarch64-unknown-linux-musl/release/. /out
 
