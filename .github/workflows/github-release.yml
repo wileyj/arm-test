@@ -27,7 +27,7 @@ jobs:
           draft: false
           prerelease: true
 
-  upload:
+  upload-archives:
     if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
     needs: create

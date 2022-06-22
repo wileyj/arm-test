@@ -16,7 +16,6 @@ on:
         required: true
 
 env:
-  # BUILD_PLATFORMS: linux/amd64, linux/amd64/v2, linux/amd64/v3
   LINUX_VERSION: debian
 
 jobs:

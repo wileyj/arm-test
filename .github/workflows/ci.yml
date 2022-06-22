@@ -61,7 +61,7 @@ jobs:
     needs: github-release
     with:
       tag: ${{ github.event.inputs.tag }}
-      build_platforms: ${{ github.env.build_platforms }}
+      build_platforms: ${{ github.env.debian_platforms }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

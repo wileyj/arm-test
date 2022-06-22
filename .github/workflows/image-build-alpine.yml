@@ -15,9 +15,6 @@ on:
       DOCKERHUB_PASSWORD:
         required: true
 
-env:
-  BUILD_PLATFORMS: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
-
 jobs:
   images:
     runs-on: ubuntu-latest
