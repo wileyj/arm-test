@@ -12,8 +12,8 @@ on:
         required: false
 
 env:
-  build_platforms: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
-  debian_platforms: linux/amd64
+  build_platforms: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
+  debian_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
 
 concurrency:
   group: arm-test-${{ github.ref }}
