@@ -1,9 +1,5 @@
 name: CI
 
-env:
-  ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
-  DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
-  TEST_ENV: wileyj
 on:
   # push:
   #   tags:
@@ -44,6 +40,8 @@ jobs:
   docker-alpine-vals:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
+    env:
+      ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     steps:
       - name: vals
         run: |
@@ -64,9 +62,8 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
     needs: github-release
-    # env:
-    # platforms: $ALPINE_ARCH
-    # ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
+    env:
+      ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
       platforms: $ALPINE_ARCH
@@ -77,11 +74,12 @@ jobs:
   docker-debian-vals:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
+    env:
+      DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     steps:
       - name: vals
         run: |
           echo "Docker Debian Vals"
-          echo "TEST_ENV: $TEST_ENV"
           echo "DEBIAN_ARCH: $DEBIAN_ARCH"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
@@ -97,9 +95,8 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
     needs: github-release
-    # env:
-    # platforms: ${{ env.DEBIAN_ARCH }}
-    #   DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
+    env:
+      DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
       platforms: $DEBIAN_ARCH
@@ -113,11 +110,12 @@ jobs:
   build-branch-vals:
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     runs-on: ubuntu-latest
+    env:
+      DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     steps:
       - name: vals
         run: |
           echo "Build Branch Vals"
-          echo "TEST_ENV: $TEST_ENV"
           echo "DEBIAN_ARCH:  $DEBIAN_ARCH"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
@@ -132,9 +130,8 @@ jobs:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
-    # env:
-    # platforms: ${{ env.DEBIAN_ARCH }}
-    #   DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
+    env:
+      DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       build_platforms: $DEBIAN_ARCH
     secrets:
