@@ -12,13 +12,12 @@ on:
         required: false
 
 env:
-  build_platforms: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
-  debian_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
+  ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
+  DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
 
 concurrency:
-  group: arm-test-${{ github.ref }}
-  # Only cancel in progress if this is for a PR
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   ########################################################################
@@ -27,41 +26,75 @@ jobs:
   build-source:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     # Note: build matrix is defined in ./build-source-binary.yml (it is not reusable)
-    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     with:
-      tag: ${{ github.event.inputs.tag }}
+      tag: ${{ inputs.tag }}
 
   github-release:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/github-release.yml@master
     needs: build-source
     with:
-      tag: ${{ github.event.inputs.tag }}
+      tag: ${{ inputs.tag }}
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  docker-alpine-vals:
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: vals
+        run: |
+          echo "Alpine Debian Vals"
+          echo "DEBIAN_ARCH: ${{ env.ALPINE_ARCH }}"
+          echo "inputs.tag: ${{ inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "branch: ${{ github.ref_name }}"
+          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
+          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
+          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
+          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
   docker-alpine:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
     needs: github-release
     with:
-      tag: ${{ github.event.inputs.tag }}
-      build_platforms: ${{ github.env.build_platforms }}
+      tag: ${{ inputs.tag }}
+      platforms: ${{ env.ALPINE_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+  docker-debian-vals:
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: vals
+        run: |
+          echo "Docker Debian Vals"
+          echo "DEBIAN_ARCH: ${{ env.DEBIAN_ARCH }}"
+          echo "inputs.tag: ${{ inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "branch: ${{ github.ref_name }}"
+          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
+          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
+          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
+          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
   docker-debian:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
-    if: ${{ github.event.inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
     needs: github-release
     with:
-      tag: ${{ github.event.inputs.tag }}
-      build_platforms: ${{ github.env.debian_platforms }}
+      tag: ${{ inputs.tag }}
+      platforms: ${{ env.DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -69,19 +102,36 @@ jobs:
   ########################################################################
   ## Build Branch/PR
   ########################################################################
+  build-branch-vals:
+    if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: vals
+        run: |
+          echo "Build Branch Vals"
+          echo "DEBIAN_ARCH: ${{ env.DEBIAN_ARCH }}"
+          echo "inputs.tag: ${{ inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "branch: ${{ github.ref_name }}"
+          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
+          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
+          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
+          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
   build-branch:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
-    if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
     with:
-      build_platforms: ${{ github.env.debian_platforms }}
+      build_platforms: ${{ github.env.DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
   # build-branch:
   #   # Only run if (a tag was NOT passed in) -OR- (we're building a non-master branch which isn't a PR)
-  #   if: ${{ github.event.inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+  #   if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
   #   runs-on: ubuntu-latest
   #   steps:
   #     # extract branch name NOT a pull request
@@ -98,7 +148,7 @@ jobs:
   #     - name: vals
   #       run: |
   #         echo "Build images from source"
-  #         echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
+  #         echo "inputs.tag: ${{ inputs.tag }}"
   #         echo "github.ref: ${{ github.ref }}"
   #         echo "branch: ${{ github.ref_name }}"
   #         echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"

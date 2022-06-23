@@ -10,6 +10,11 @@ on:
       GH_TOKEN:
         required: true
 jobs:
+  ## TODO: what about zip checksums? can those be published in the release?
+  # https://github.com/marketplace/actions/ghaction-checksum-sign-artifact
+
+  ## verify the file checksum, delete github-release and exit if fails
+  # https://github.com/marketplace/actions/verify-file-checksum
   create:
     if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
@@ -19,6 +24,7 @@ jobs:
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
+        # https://github.com/marketplace/actions/create-release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:

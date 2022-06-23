@@ -6,6 +6,7 @@ on:
       build_platforms:
         required: true
         type: string
+        # default: linux/amd64, linux/amd64/v2, linux/amd64/v3
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -57,11 +58,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: Workflow Values
+        run: |
+          echo "Docker Debian-source Vals"
+          echo "inputs.platform: ${{ inputs.platforms }}"
+          echo "inputs.tag: ${{ inputs.tag }}"
+          echo "LINUX_VERSION: ${{ env.LINUX_VERSION }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "branch: ${{ github.ref_name }}"
+          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
+          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
+          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
+          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
+
       - name: Build/Tag/Push Image
         uses: docker/build-push-action@v2
         with:
-          platforms: ${{ github.event.inputs.build_platforms }}
           file: Dockerfile.debian-source
+          platforms: ${{ github.event.inputs.build_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
