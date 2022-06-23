@@ -48,8 +48,8 @@ jobs:
       - name: vals
         run: |
           echo "Alpine Debian Vals"
-          echo "TEST_ENV: ${{ env.TEST_ENV }}"
-          echo "ALPINE_ARCH: ${{ env.ALPINE_ARCH }}"
+          echo "TEST_ENV: ${{ TEST_ENV }}"
+          echo "ALPINE_ARCH: ${{ ALPINE_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -64,12 +64,12 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
     needs: github-release
-    env:
-      platforms: ${{ env.ALPINE_ARCH }}
-      # ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
+    # env:
+    # platforms: ${{ ALPINE_ARCH }}
+    # ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ env.ALPINE_ARCH }}
+      platforms: ${{ ALPINE_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -81,8 +81,8 @@ jobs:
       - name: vals
         run: |
           echo "Docker Debian Vals"
-          echo "TEST_ENV: ${{ env.TEST_ENV }}"
-          echo "DEBIAN_ARCH:  ${{ env.DEBIAN_ARCH }}"
+          echo "TEST_ENV: ${{ TEST_ENV }}"
+          echo "DEBIAN_ARCH: ${{ DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -97,12 +97,12 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
     needs: github-release
-    env:
-      platforms: ${{ env.DEBIAN_ARCH }}
+    # env:
+    # platforms: ${{ env.DEBIAN_ARCH }}
     #   DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ env.DEBIAN_ARCH }}
+      platforms: ${{ DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -117,8 +117,8 @@ jobs:
       - name: vals
         run: |
           echo "Build Branch Vals"
-          echo "TEST_ENV: ${{ env.TEST_ENV }}"
-          echo "DEBIAN_ARCH:  ${{ env.DEBIAN_ARCH }}"
+          echo "TEST_ENV: ${{ TEST_ENV }}"
+          echo "DEBIAN_ARCH:  ${{ DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -132,11 +132,11 @@ jobs:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
-    env:
-      platforms: ${{ env.DEBIAN_ARCH }}
+    # env:
+    # platforms: ${{ env.DEBIAN_ARCH }}
     #   DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
-      build_platforms: ${{ env.DEBIAN_ARCH }}
+      build_platforms: ${{ DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
