@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
+  DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
+  TEST_ENV: wileyj
 on:
   # push:
   #   tags:
@@ -10,10 +14,6 @@ on:
       tag:
         description: "The tag to create (optional)"
         required: false
-
-env:
-  ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3 # for release, build amd *and* most recent arm64 arch
-  DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3 # only amd arch is supported for branch/pr builds
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -48,7 +48,8 @@ jobs:
       - name: vals
         run: |
           echo "Alpine Debian Vals"
-          echo "DEBIAN_ARCH: ${{ github.env.ALPINE_ARCH }}"
+          echo "TEST_ENV: ${{ env.TEST_ENV }}"
+          echo "ALPINE_ARCH: ${{ env.ALPINE_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -63,9 +64,11 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-alpine.yml@master
     needs: github-release
+    # env:
+    #     ALPINE_ARCH: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ github.env.ALPINE_ARCH }}
+      platforms: ${{ env.ALPINE_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -77,7 +80,8 @@ jobs:
       - name: vals
         run: |
           echo "Docker Debian Vals"
-          echo "DEBIAN_ARCH: ${{ github.env.DEBIAN_ARCH }}"
+          echo "TEST_ENV: ${{ env.TEST_ENV }}"
+          echo "DEBIAN_ARCH:  ${{ env.DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -92,9 +96,11 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
     needs: github-release
+    # env:
+    #   DEBIAN_ARCH: linux/amd64, linux/amd64/v2, linux/amd64/v3
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ github.env.DEBIAN_ARCH }}
+      platforms: ${{ env.DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -109,7 +115,8 @@ jobs:
       - name: vals
         run: |
           echo "Build Branch Vals"
-          echo "DEBIAN_ARCH: ${{ github.env.DEBIAN_ARCH }}"
+          echo "TEST_ENV: ${{ env.TEST_ENV }}"
+          echo "DEBIAN_ARCH:  ${{ env.DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -124,36 +131,7 @@ jobs:
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
     with:
-      build_platforms: ${{ github.env.DEBIAN_ARCH }}
+      build_platforms: ${{ env.DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  # build-branch:
-  #   # Only run if (a tag was NOT passed in) -OR- (we're building a non-master branch which isn't a PR)
-  #   if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     # extract branch name NOT a pull request
-  #     - name: Extract branch name
-  #       if: ${{ github.event_name != 'pull_request' }}
-  #       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-  #       id: extract_branch
-  #
-  #     # extract branch name on pull request
-  #     - name: PR branch name
-  #       if: ${{ github.event_name == 'pull_request' }}
-  #       run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
-  #
-  #     - name: vals
-  #       run: |
-  #         echo "Build images from source"
-  #         echo "inputs.tag: ${{ inputs.tag }}"
-  #         echo "github.ref: ${{ github.ref }}"
-  #         echo "branch: ${{ github.ref_name }}"
-  #         echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
-  #         echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
-  #         echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
-  #         echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
-  #         echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
-  #         echo "Branch Name: ${{ env.BRANCH_NAME }}"

@@ -6,8 +6,10 @@ on:
       tag:
         required: true
         type: string
+        description: "semver tag for alpine images"
       platforms:
         required: true
+        description: "Arch to buid alpine images"
         type: string
         # default: linux/arm64, linux/amd64, linux/amd64/v2, linux/amd64/v3
     secrets:

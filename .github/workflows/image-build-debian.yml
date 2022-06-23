@@ -6,8 +6,10 @@ on:
       tag:
         required: true
         type: string
+        description: "semver tag for debian images"
       platforms:
         required: true
+        description: "Arch to buid debian images"
         type: string
         # default: linux/amd64, linux/amd64/v2, linux/amd64/v3
     secrets:
