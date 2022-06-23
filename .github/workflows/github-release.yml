@@ -23,15 +23,26 @@ jobs:
     steps:
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        # https://github.com/marketplace/actions/create-release
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
+          name: Release ${{ github.event.inputs.tag || github.ref }}
           tag_name: ${{ github.event.inputs.tag || github.ref }}
-          release_name: Release ${{ github.event.inputs.tag || github.ref }}
           draft: false
           prerelease: true
+
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   # https://github.com/marketplace/actions/create-release
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.event.inputs.tag || github.ref }}
+      #     release_name: Release ${{ github.event.inputs.tag || github.ref }}
+      #     draft: false
+      #     prerelease: true
 
   upload-archives:
     if: ${{ github.event.inputs.tag != '' }}
@@ -43,8 +54,8 @@ jobs:
         platform:
           - linux-glibc-x64
           - linux-musl-x64
-          - linux-glibc-arm64
-          - linux-musl-arm64
+          # - linux-glibc-arm64
+          # - linux-musl-arm64
           # - macos-x64
           # - macos-arm64
           # - windows-x64
@@ -57,12 +68,32 @@ jobs:
           name: ${{ matrix.platform }}
           path: dist/
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: ./dist/${{ matrix.platform }}.zip
-          asset_name: ${{ matrix.platform }}.zip
-          asset_content_type: application/zip
+          fail_on_unmatched_files: true
+          files: |
+            ./dist/${{ matrix.platform }}.zip
+            ./dist/${{ matrix.platform }}.zip.sha256
+
+      # - name: Upload Release Asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ needs.create.outputs.upload_url }}
+      #     asset_path: ./dist/${{ matrix.platform }}.zip
+      #     asset_name: ${{ matrix.platform }}.zip
+      #     asset_content_type: application/zip
+
+      # - name: Upload Release Asset Checksum
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ needs.create.outputs.upload_url }}
+      #     asset_path: ./dist/${{ matrix.platform }}.zip.sha256
+      #     asset_name: ${{ matrix.platform }}.zip.sha256
+      #     asset_content_type: application/zip
