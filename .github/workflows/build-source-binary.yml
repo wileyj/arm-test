@@ -31,7 +31,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Build distributable
+      - name: Build Binaries
+        id: build_binaries
         uses: docker/build-push-action@v3
         with:
           file: build-scripts/Dockerfile.${{ matrix.platform }}
@@ -42,22 +43,37 @@ jobs:
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
 
       - name: Compress artifact
+        id: compress_artifact
         run: zip --junk-paths ${{ matrix.platform }} ./dist/${{ matrix.platform }}/*
 
       - name: Upload artifact
+        id: upload_artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.platform }}
           path: ${{ matrix.platform }}.zip
 
-      - name: artifact checksum
-        uses: tristan-weil/ghaction-checksum-sign-artifact@v1
-        with:
-          path: ${{ matrix.platform }}.zip
-          checksum_output: artifact_one_file_per_digest
+      # - name: artifact checksum
+      #   id: artifact_checksum
+      #   uses: tristan-weil/ghaction-checksum-sign-artifact@v1
+      #   with:
+      #     checksum_format: gnu
+      #     checksum_output: one_file
+      #     path: ${{ matrix.platform }}.zip
+      #     # checksum_output: artifact_one_file_per_digest
+      # - name: Upload checksum
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ matrix.platform }}
+      #     path: ${{ matrix.platform }}.zip.sha256
+      #
+      #
+      #
+      #
 
-      - name: Upload checksum
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.platform }}
-          path: ${{ matrix.platform }}.zip.sha256
+      # - name: Upload checksum
+      #   id: upload_checksum
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ${{ steps.artifact_checksum.outputs.generated-files }}
+      #     path: ${{ steps.artifact_checksum.outputs.generated-files }}
