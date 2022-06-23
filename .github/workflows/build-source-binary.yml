@@ -49,3 +49,15 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: ${{ matrix.platform }}.zip
+
+      - name: artifact checksum
+        uses: tristan-weil/ghaction-checksum-sign-artifact@v1
+        with:
+          path: ${{ matrix.platform }}.zip
+          checksum_output: artifact_one_file_per_digest
+
+      - name: Upload checksum
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.platform }}
+          path: ${{ matrix.platform }}.zip.sha256
