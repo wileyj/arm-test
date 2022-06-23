@@ -37,7 +37,7 @@ jobs:
         with:
           checksum_format: gnu
           checksum_output: one_file
-          path: ./dist/**.zip
+          path: ./dist/*.zip
           # path: ./dist/${{ matrix.platform }}.zip
           # checksum_output: artifact_one_file_per_digest
 
