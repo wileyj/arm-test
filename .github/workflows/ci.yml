@@ -48,7 +48,7 @@ jobs:
       - name: vals
         run: |
           echo "Alpine Debian Vals"
-          echo "DEBIAN_ARCH: ${{ env.ALPINE_ARCH }}"
+          echo "DEBIAN_ARCH: ${{ github.env.ALPINE_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -65,7 +65,7 @@ jobs:
     needs: github-release
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ env.ALPINE_ARCH }}
+      platforms: ${{ github.env.ALPINE_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -77,7 +77,7 @@ jobs:
       - name: vals
         run: |
           echo "Docker Debian Vals"
-          echo "DEBIAN_ARCH: ${{ env.DEBIAN_ARCH }}"
+          echo "DEBIAN_ARCH: ${{ github.env.DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
@@ -94,7 +94,7 @@ jobs:
     needs: github-release
     with:
       tag: ${{ inputs.tag }}
-      platforms: ${{ env.DEBIAN_ARCH }}
+      platforms: ${{ github.env.DEBIAN_ARCH }}
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -109,7 +109,7 @@ jobs:
       - name: vals
         run: |
           echo "Build Branch Vals"
-          echo "DEBIAN_ARCH: ${{ env.DEBIAN_ARCH }}"
+          echo "DEBIAN_ARCH: ${{ github.env.DEBIAN_ARCH }}"
           echo "inputs.tag: ${{ inputs.tag }}"
           echo "github.ref: ${{ github.ref }}"
           echo "branch: ${{ github.ref_name }}"
