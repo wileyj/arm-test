@@ -31,6 +31,10 @@ jobs:
           # name: ${{ matrix.platform }}
           path: dist/
 
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: dist/
+
       - name: Artifact Checksums
         id: artifact_checksum
         uses: tristan-weil/ghaction-checksum-sign-artifact@v1
