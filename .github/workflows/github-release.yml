@@ -57,5 +57,5 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: true
           files: |
-            ./dist/${{ matrix.platform }}.zip
+            ./dist/artifact/${{ matrix.platform }}.zip
             ${{ steps.artifact_checksum.outputs.generated-files }}
