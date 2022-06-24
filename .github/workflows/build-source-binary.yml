@@ -50,7 +50,7 @@ jobs:
         id: upload_artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.platform }}.zip
+          name: ${{ matrix.platform }}
           path: ${{ matrix.platform }}.zip
 
       # - name: artifact checksum
