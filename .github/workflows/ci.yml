@@ -72,7 +72,7 @@ jobs:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/arm-test/.github/workflows/image-build-debian.yml@master
-    uses: ./.github/workflows/image-build-debian.yml@master
+    uses: ./.github/workflows/image-build-debian.yml
     needs: github-release
     with:
       tag: ${{ inputs.tag }}
@@ -88,7 +88,7 @@ jobs:
     # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/arm-test/.github/workflows/build-source-image.yml@master
-    uses: ./.github/workflows/build-source-image.yml@master
+    uses: ./.github/workflows/build-source-image.yml
     with:
       platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
     secrets:
