@@ -36,6 +36,11 @@ jobs:
           checksum_format: gnu
           checksum_output: one_file
           path: dist/artifact/*.zip
+          # sign_key: '${{ secrets.SIGN_KEY }}'
+          # sign_key_passphrase: '${{ secrets.SIGN_KEY_PASSPHRASE }}'
+          # sign_key_fingerprint: 'ABCD1234'
+          # sign_keyserver: 'keys.openpgp.org'
+          # sign_output: checksum_detach
 
       - name: Create Release
         id: create_release
