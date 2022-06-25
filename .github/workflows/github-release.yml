@@ -16,24 +16,23 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        platform:
-          - linux-glibc-x64
-          - linux-musl-x64
-          # - linux-glibc-arm64
-          # - linux-musl-arm64
-          # - macos-x64
-          # - macos-arm64
-          # - windows-x64
+        node-version: ${{fromJson(inputs.platforms)}}
+      # matrix:
+      #   platform:
+      #     - linux-glibc-x64
+      #     - linux-musl-x64
+      #     # - linux-glibc-arm64
+      #     # - linux-musl-arm64
+      #     # - macos-x64
+      #     # - macos-arm64
+      #     # - windows-x64
+
     steps:
       - name: Download Artifacts
+        id: download_artifacts
         uses: actions/download-artifact@v3
         with:
-          # name: ${{ matrix.platform }}
           path: dist/
-
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: dist/
 
       - name: Artifact Checksums
         id: artifact_checksum
@@ -42,8 +41,6 @@ jobs:
           checksum_format: gnu
           checksum_output: one_file
           path: dist/artifact/*.zip
-          # path: ./dist/${{ matrix.platform }}.zip
-          # checksum_output: artifact_one_file_per_digest
 
       - name: Create Release
         id: create_release

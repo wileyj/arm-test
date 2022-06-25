@@ -26,6 +26,8 @@ jobs:
     uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     with:
       tag: ${{ inputs.tag }}
+      platforms: >-
+        ["linux-glibc-x64", linux-musl-x64"]
 
   github-release:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
@@ -34,6 +36,10 @@ jobs:
     needs: build-source
     with:
       tag: ${{ inputs.tag }}
+      platforms: >-
+        ["linux-glibc-x64", linux-musl-x64"]
+      # platforms: >-
+      #   ["linux-glibc-x64", linux-musl-x64", "linux-glibc-arm64", "linux-musl-arm64", "macos-x64", "macos-arm64", "windows-x64"]
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
