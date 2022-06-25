@@ -6,6 +6,10 @@ on:
       tag:
         required: true
         type: string
+      platform:
+        description: "Stringified JSON object listing of platform matrix"
+        required: true
+        type: string
     secrets:
       GH_TOKEN:
         required: true
@@ -16,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        node-version: ${{fromJson(inputs.platforms)}}
+        platform: ${{fromJson(inputs.platform)}}
       # matrix:
       #   platform:
       #     - linux-glibc-x64
