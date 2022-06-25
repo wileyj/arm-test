@@ -6,6 +6,10 @@ on:
       tag:
         required: true
         type: string
+      parallel-jobs:
+        required: false
+        type: number
+        default: 4
       platform:
         description: "Stringified JSON object listing of platform matrix"
         required: true
@@ -15,21 +19,12 @@ jobs:
     if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      max-parallel: ${{ inputs.parallel-jobs }}
       matrix:
         platform: ${{fromJson(inputs.platform)}}
-      # matrix:
-      #   platform:
-      #     - linux-glibc-x64
-      #     - linux-musl-x64
-      #     # - linux-glibc-arm64
-      #     # - linux-musl-arm64
-      #     # - macos-x64
-      #     # - macos-arm64
-      #     # - windows-x64
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set Vars
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV

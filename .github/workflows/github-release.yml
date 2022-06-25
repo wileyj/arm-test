@@ -21,15 +21,6 @@ jobs:
       max-parallel: 4
       matrix:
         platform: ${{fromJson(inputs.platform)}}
-      # matrix:
-      #   platform:
-      #     - linux-glibc-x64
-      #     - linux-musl-x64
-      #     # - linux-glibc-arm64
-      #     # - linux-musl-arm64
-      #     # - macos-x64
-      #     # - macos-arm64
-      #     # - windows-x64
 
     steps:
       - name: Download Artifacts

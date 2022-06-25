@@ -11,7 +11,7 @@ on:
         required: true
         description: "Arch to buid debian images"
         type: string
-        # default: linux/amd64, linux/amd64/v2, linux/amd64/v3
+        default: linux/amd64, linux/amd64/v2, linux/amd64/v3
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -25,7 +25,7 @@ jobs:
   images:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set Vars
         if: ${{ inputs.tag != '' }}
@@ -72,28 +72,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Workflow Values
-        if: ${{ inputs.tag != '' }}
-        run: |
-          echo "Docker Debian Vals"
-          echo "inputs.platform: ${{ inputs.platforms }}"
-          echo "inputs.tag: ${{ inputs.tag }}"
-          echo "LINUX_VERSION: ${{ env.LINUX_VERSION }}"
-          echo "github.ref: ${{ github.ref }}"
-          echo "branch: ${{ github.ref_name }}"
-          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
-          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
-          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
-          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
-          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
-          echo "Branch Name: ${{ env.BRANCH_NAME }}"
-
       - name: Build Image
         if: ${{ inputs.tag != '' }}
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.debian-binary
-          # platforms: ${{ env.BUILD_PLATFORMS }}
           platforms: ${{ inputs.platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
