@@ -7,7 +7,7 @@ on:
         required: true
         type: string
         description: "semver tag for debian images"
-      platforms:
+      docker_platforms:
         required: true
         description: "Arch to buid debian images"
         type: string
@@ -76,7 +76,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.debian-binary
-          platforms: ${{ inputs.platforms }}
+          platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

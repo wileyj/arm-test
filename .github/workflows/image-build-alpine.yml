@@ -7,7 +7,7 @@ on:
         required: true
         type: string
         description: "semver tag for alpine images"
-      platforms:
+      docker_platforms:
         required: true
         description: "Arch to buid alpine images"
         type: string
@@ -63,7 +63,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: ./Dockerfile.alpine-binary
-          platforms: ${{ inputs.platforms }}
+          platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |

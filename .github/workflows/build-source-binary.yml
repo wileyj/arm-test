@@ -10,7 +10,7 @@ on:
         required: false
         type: number
         default: 4
-      platform:
+      arch:
         description: "Stringified JSON object listing of platform matrix"
         required: true
         type: string
@@ -21,7 +21,7 @@ jobs:
     strategy:
       max-parallel: ${{ inputs.parallel_jobs}}
       matrix:
-        platform: ${{fromJson(inputs.platform)}}
+        platform: ${{fromJson(inputs.arch)}}
 
     steps:
       - uses: actions/checkout@v3
