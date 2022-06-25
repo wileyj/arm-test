@@ -26,7 +26,7 @@ jobs:
     uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     with:
       tag: ${{ inputs.tag }}
-      parallel-jobs: 4
+      parallel_jobs: 4
       platform: >-
         ["linux-glibc-x64", "linux-musl-x64"]
       # platforms: >-

@@ -6,7 +6,7 @@ on:
       tag:
         required: true
         type: string
-      parallel-jobs:
+      parallel_jobs:
         required: false
         type: number
         default: 4
@@ -19,7 +19,7 @@ jobs:
     if: ${{ github.event.inputs.tag != '' }}
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: ${{ inputs.parallel-jobs }}
+      max-parallel: ${{ inputs.parallel_jobs}}
       matrix:
         platform: ${{fromJson(inputs.platform)}}
 
