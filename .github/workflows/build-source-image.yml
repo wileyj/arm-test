@@ -1,4 +1,4 @@
-name: Build Source Debian
+name: Build Debian Source Image
 
 on:
   workflow_call:
@@ -16,12 +16,13 @@ env:
   LINUX_VERSION: debian
 
 jobs:
-  debian:
+  image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - name: Set Vars
+        id: set_vars
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
@@ -29,16 +30,17 @@ jobs:
       # extract branch name NOT a pull request
       - name: Extract branch name
         if: ${{ github.event_name != 'pull_request' }}
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
         id: extract_branch
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       # extract branch name on pull request
-      - name: PR branch name
+      - name: PR extract branch name
         if: ${{ github.event_name == 'pull_request' }}
+        id: pr_extract_branch
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
-      - name: Docker meta
-        id: meta
+      - name: Docker metadata
+        id: docker_metadata
         uses: docker/metadata-action@v4
         with:
           images: |
@@ -48,15 +50,17 @@ jobs:
             type=ref,event=pr
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        id: docker_login
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build/Tag/Push Image
-        uses: docker/build-push-action@v2
+      - name: Build Image
+        id: build_image
+        uses: docker/build-push-action@v3
         with:
-          file: Dockerfile.debian-source
+          file: ./github/actions/dockerhub/Dockerfile.debian
           platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
