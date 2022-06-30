@@ -62,7 +62,7 @@ jobs:
         id: build_image
         uses: docker/build-push-action@v3
         with:
-          file: ./github/actions/dockerhub/Dockerfile.alpine-binary
+          file: ./.github/actions/dockerhub/Dockerfile.alpine-binary
           platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
