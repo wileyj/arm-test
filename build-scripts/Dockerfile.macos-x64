@@ -3,9 +3,9 @@ FROM rust:bullseye as build
 ARG STACKS_NODE_VERSION="No Version Info"
 ARG GIT_BRANCH='No Branch Info'
 ARG GIT_COMMIT='No Commit Info'
-ENV BUILD_DIR=/build
-ENV OSXCROSS="https://github.com/hirosystems/docker-osxcross-rust/releases/download/MacOSX12.0.sdk/osxcross-d904031_MacOSX12.0.sdk.tar.zst"
-
+ARG BUILD_DIR=/build
+ARG OSXCROSS="https://github.com/hirosystems/docker-osxcross-rust/releases/download/MacOSX12.0.sdk/osxcross-d904031_MacOSX12.0.sdk.tar.zst"
+ARG TARGET=x86_64-apple-darwin
 WORKDIR /src
 
 COPY . .
@@ -17,11 +17,11 @@ RUN wget -nc -O /tmp/osxcross.tar.zst ${OSXCROSS} \
 
 RUN --mount=type=tmpfs,target=${BUILD_DIR} cp -R /src/. ${BUILD_DIR}/ \
     && cd ${BUILD_DIR} \
-    && rustup target add x86_64-apple-darwin \
+    && rustup target add ${TARGET} \
     && . /opt/osxcross/env-macos-x86_64 \
-    && cargo build --target x86_64-apple-darwin --release --workspace \
+    && cargo build --release --workspace --target ${TARGET} --features monitoring_prom,slog_json \
     && mkdir -p /out \
-    && cp -R ${BUILD_DIR}/target/x86_64-apple-darwin/release/. /out
+    && cp -R ${BUILD_DIR}/target/${TARGET}/release/. /out
 
 FROM scratch AS export-stage
 COPY --from=build /out/rusty-blockparser* /
