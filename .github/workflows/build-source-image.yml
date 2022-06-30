@@ -62,8 +62,8 @@ jobs:
         with:
           file: ./github/actions/dockerhub/Dockerfile.debian
           platforms: ${{ inputs.docker_platforms }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.docker_metadata.outputs.tags }}
+          labels: ${{ steps.docker_metadata.outputs.labels }}
           build-args: |
             STACKS_NODE_VERSION=${{ env.GITHUB_SHA_SHORT }}
             GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
