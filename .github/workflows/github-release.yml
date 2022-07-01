@@ -30,18 +30,18 @@ jobs:
           path: dist/
 
       - name: Artifact Checksums
-        id: artifact_checksum
+        id: create_checksum
         uses: tristan-weil/ghaction-checksum-sign-artifact@v1
         with:
           checksum_format: gnu
           checksum_output: one_file
+          # checksum_output: one_file_per_digest
           path: dist/artifact/*.zip
           # sign_key: '${{ secrets.SIGN_KEY }}'
           # sign_key_passphrase: '${{ secrets.SIGN_KEY_PASSPHRASE }}'
           # sign_key_fingerprint: 'ABCD1234'
           # sign_keyserver: 'keys.openpgp.org'
           # sign_output: checksum_detach
-          # checksum_output: one_file_per_digest
 
       - name: Create Release
         id: create_release
@@ -57,6 +57,7 @@ jobs:
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
 
+      # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
       - name: upload checksum
         id: upload_checksum
         uses: softprops/action-gh-release@v1
@@ -66,4 +67,4 @@ jobs:
           name: Release ${{ github.event.inputs.tag || github.ref }}
           tag_name: ${{ github.event.inputs.tag || github.ref }}
           files: |
-            ./${{ steps.artifact_checksum.outputs.generated-files }}
+            ./${{ steps.create_checksum.outputs.generated-files }}
