@@ -76,6 +76,7 @@ jobs:
     with:
       tag: ${{ inputs.tag }}
       docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
+      linux_version: debian
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -90,6 +91,7 @@ jobs:
     uses: ./.github/workflows/build-source-image.yml
     with:
       docker_platforms: linux/amd64
+      linux_version: debian
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

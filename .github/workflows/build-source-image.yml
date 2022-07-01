@@ -5,15 +5,19 @@ on:
     inputs:
       docker_platforms:
         required: true
-        description: "Arch to buid debian images"
+        description: "Arch to buid images"
+        type: string
+      linux_version:
+        required: true
+        description: "Linux Version to build"
         type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
-env:
-  LINUX_VERSION: debian
+# env:
+#   LINUX_VERSION: debian
 
 jobs:
   image:
@@ -39,6 +43,16 @@ jobs:
         id: pr_extract_branch
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
+      # - name: Docker Metadata
+      #   id: docker_metadata
+      #   uses: docker/metadata-action@v4
+      #   with:
+      #     images: |
+      #       wileyj/${{ github.event.repository.name }}
+      #     tags: |
+      #       type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
+      #       type=ref,event=pr
+
       - name: Docker Metadata
         id: docker_metadata
         uses: docker/metadata-action@v4
@@ -46,7 +60,7 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
+            type=raw,value=${{ env.BRANCH_NAME }}-${{ inputs.linux_version }}
             type=ref,event=pr
 
       - name: Login to DockerHub
@@ -56,27 +70,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: vals
-        run: |
-          echo "Build images from source"
-          echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
-          echo "github.ref: ${{ github.ref }}"
-          echo "branch: ${{ github.ref_name }}"
-          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
-          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
-          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
-          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
-          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
-          echo "Branch Name: ${{ env.BRANCH_NAME }}"
-          echo "github.event.repository.name: ${{ github.event.repository.name }}"
-          echo "github.event.org: ${{ github.event.org }}"
-          echo "github.event.org.login: ${{ github.event.org.login }}"
-
       - name: Build Image
         id: docker_build
         uses: docker/build-push-action@v3
         with:
-          file: ./.github/actions/dockerhub/Dockerfile.debian-source
+          file: ./.github/actions/dockerhub/Dockerfile.${{ inputs.linux_version }}-source
           platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
