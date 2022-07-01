@@ -57,8 +57,6 @@ jobs:
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
 
-      # ./dist/artifact/*.zip
-      # ./${{ steps.create_checksum.outputs.generated-files }}
       # ./dist/artifact/${{ matrix.platform }}.zip.sha256
       # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
       - name: Upload Checksum
