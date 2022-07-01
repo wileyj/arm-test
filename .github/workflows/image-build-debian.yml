@@ -45,7 +45,7 @@ jobs:
         id: extract_branch
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
-      - name: Docker meta
+      - name: Docker Metadata
         id: docker_metadata
         uses: docker/metadata-action@v4
         with:
