@@ -47,6 +47,7 @@ jobs:
       - name: Generate Checksums
         uses: jmgilman/actions-generate-checksum@v1
         with:
+          output: CHECKSUMS.txt
           patterns: |
             release/*.zip
 
@@ -67,7 +68,7 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             release/*.zip
-            checksum.txt
+            CHECKSUMS.txt
 
       # # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
       # - name: Upload Checksum
