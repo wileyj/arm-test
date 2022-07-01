@@ -1,4 +1,4 @@
-name: Build Debian Source Image
+name: Build Linux Source Image
 
 on:
   workflow_call:
@@ -9,15 +9,14 @@ on:
         type: string
       linux_version:
         required: true
-        description: "Linux Version to build"
+        description: "Linux image to build"
         type: string
+        default: debian
     secrets:
       DOCKERHUB_USERNAME:
         required: true
       DOCKERHUB_PASSWORD:
         required: true
-# env:
-#   LINUX_VERSION: debian
 
 jobs:
   image:
@@ -42,16 +41,6 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         id: pr_extract_branch
         run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
-
-      # - name: Docker Metadata
-      #   id: docker_metadata
-      #   uses: docker/metadata-action@v4
-      #   with:
-      #     images: |
-      #       wileyj/${{ github.event.repository.name }}
-      #     tags: |
-      #       type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
-      #       type=ref,event=pr
 
       - name: Docker Metadata
         id: docker_metadata
