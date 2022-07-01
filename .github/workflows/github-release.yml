@@ -49,22 +49,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          name: Release ${{ inputs.tag || github.ref }}
-          tag_name: ${{ inputs.tag || github.ref }}
+          name: Release ${{ github.event.inputs.tag || github.ref }}
+          tag_name: ${{ github.event.inputs.tag || github.ref }}
           draft: false
           prerelease: true
           fail_on_unmatched_files: true
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
-
+      # ./dist/artifact/${{ matrix.platform }}.zip.sha256
       # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
-      - name: upload checksum
+      - name: Upload Checksum
+        # # only upload the checksum once. we don't need a matrix upload here
+        # if: ${{ matrix.platform == 'linux-glibc-x64' }}
         id: upload_checksum
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
-          name: Release ${{ inputs.tag || github.ref }}
-          tag_name: ${{ inputs.tag || github.ref }}
+          name: Release ${{ github.event.inputs.tag || github.ref }}
+          tag_name: ${{ github.event.inputs.tag || github.ref }}
+          fail_on_unmatched_files: false
           files: |
             ./${{ steps.create_checksum.outputs.generated-files }}
