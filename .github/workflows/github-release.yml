@@ -15,7 +15,7 @@ on:
         required: true
 jobs:
   create-release:
-    if: ${{ github.event.inputs.tag != '' }}
+    if: ${{ inputs.tag != '' }}
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4

@@ -48,6 +48,6 @@ jobs:
 
       - name: Upload artifact
         id: upload_artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           path: ${{ matrix.platform }}.zip
