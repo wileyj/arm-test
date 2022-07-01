@@ -41,6 +41,7 @@ jobs:
           # sign_key_fingerprint: 'ABCD1234'
           # sign_keyserver: 'keys.openpgp.org'
           # sign_output: checksum_detach
+          # checksum_output: one_file_per_digest
 
       - name: Create Release
         id: create_release
@@ -49,10 +50,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           name: Release ${{ github.event.inputs.tag || github.ref }}
-          tag_name: ${{ github.event.inputs.tag || github.ref }}
+          tag_name: ${{ inputs.tag || github.ref }}
           draft: false
           prerelease: true
           fail_on_unmatched_files: true
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
+
+      - name: upload checksum
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          name: Release ${{ github.event.inputs.tag || github.ref }}
+          tag_name: ${{ github.event.inputs.tag || github.ref }}
+          files: |
             ./${{ steps.artifact_checksum.outputs.generated-files }}
