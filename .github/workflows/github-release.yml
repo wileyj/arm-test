@@ -51,15 +51,12 @@ jobs:
         with:
           name: Release ${{ github.event.inputs.tag || github.ref }}
           tag_name: ${{ github.event.inputs.tag || github.ref }}
-          # tag_name: ${{ inputs.tag || github.ref }}
           draft: false
           prerelease: true
           fail_on_unmatched_files: true
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
 
-      # ./dist/artifact/*.zip
-      # ./${{ steps.create_checksum.outputs.generated-files }}
       # ./dist/artifact/${{ matrix.platform }}.zip.sha256
       # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
       - name: Upload Checksum
@@ -72,8 +69,6 @@ jobs:
         with:
           name: Release ${{ github.event.inputs.tag || github.ref }}
           # tag_name: ${{ github.event.inputs.tag || github.ref }}
-          # name: Release ${{ inputs.tag || github.ref }}
-          # # tag_name: ${{ inputs.tag || github.ref }}
           fail_on_unmatched_files: false
           files: |
             ./${{ steps.create_checksum.outputs.generated-files }}
