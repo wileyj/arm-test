@@ -17,17 +17,17 @@ jobs:
   create-release:
     if: ${{ inputs.tag != '' }}
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        platform: ${{fromJson(inputs.arch)}}
+    # strategy:
+    #   max-parallel: 4
+    #   matrix:
+    #     platform: ${{fromJson(inputs.arch)}}
 
     steps:
       - name: Download Artifacts
         id: download_artifacts
         uses: actions/download-artifact@v3
         with:
-          path: dist
+          path: release
 
       # - name: Artifact Checksums
       #   id: create_checksum
@@ -43,17 +43,15 @@ jobs:
       #     # sign_keyserver: 'keys.openpgp.org'
       #     # sign_output: checksum_detach
 
-      - name: Generate checksum
+      - name: Generate Checksums
         uses: jmgilman/actions-generate-checksum@v1
         with:
-          method: sha256
-          output: checksum.txt
           patterns: |
-            dist/artifact/*.zip
+            release/*.zip
 
       - name: Display artifact files
         run: ls -R
-        working-directory: dist
+        working-directory: release
 
       - name: Upload Release
         id: upload_release
@@ -67,7 +65,7 @@ jobs:
           prerelease: true
           fail_on_unmatched_files: true
           files: |
-            dist/artifact/${{ matrix.platform }}.zip
+            release/*.zip
             checksum.txt
 
       # # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
