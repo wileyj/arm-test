@@ -26,6 +26,7 @@ jobs:
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       # extract branch name NOT a pull request
       - name: Extract branch name
         if: ${{ github.event_name != 'pull_request' }}
@@ -54,6 +55,22 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: vals
+        run: |
+          echo "Build images from source"
+          echo "github.event.inputs.tag: ${{ github.event.inputs.tag }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "branch: ${{ github.ref_name }}"
+          echo "GITHUB_HEAD_REF: ${{ env.GITHUB_HEAD_REF }}"
+          echo "GITHUB_BASE_REF: ${{ env.GITHUB_BASE_REF }}"
+          echo "GITHUB_REF: ${{ env.GITHUB_REF }}"
+          echo "GITHUB_REF_NAME: ${{ env.GITHUB_REF_NAME }}"
+          echo "extracted: ${{ steps.extract_branch.outputs.branch }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
+          echo "github.event.repository.name: ${{ github.event.repository.name }}"
+          echo "github.event.org: ${{ github.event.org }}"
+          echo "github.event.org.login: ${{ github.event.org.login }}"
 
       - name: Build Image
         id: docker_build
