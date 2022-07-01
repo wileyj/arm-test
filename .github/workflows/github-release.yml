@@ -27,6 +27,7 @@ jobs:
         id: download_artifacts
         uses: actions/download-artifact@v3
         with:
+          name: release-artifacts
           path: release
 
       # - name: Artifact Checksums
