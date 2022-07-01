@@ -47,7 +47,7 @@ jobs:
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
 
       - name: Docker meta
-        id: meta
+        id: docker_metadata
         uses: docker/metadata-action@v4
         with:
           images: |
@@ -71,8 +71,8 @@ jobs:
         with:
           file: ./.github/actions/dockerhub/Dockerfile.debian-binary
           platforms: ${{ inputs.docker_platforms }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.docker_metadata.outputs.tags }}
+          labels: ${{ steps.docker_metadata.outputs.labels }}
           build-args: |
             TAG=${{ inputs.tag}}
             STACKS_NODE_VERSION=${{ inputs.tag || env.GITHUB_SHA_SHORT }}
