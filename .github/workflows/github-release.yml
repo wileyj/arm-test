@@ -68,7 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           name: Release ${{ github.event.inputs.tag || github.ref }}
-          tag_name: ${{ github.event.inputs.tag || github.ref }}
+          # tag_name: ${{ github.event.inputs.tag || github.ref }}
           fail_on_unmatched_files: false
           files: |
             ./${{ steps.create_checksum.outputs.generated-files }}
