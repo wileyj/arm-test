@@ -43,8 +43,8 @@ jobs:
           # sign_keyserver: 'keys.openpgp.org'
           # sign_output: checksum_detach
 
-      - name: Create Release
-        id: create_release
+      - name: Upload Release
+        id: upload_release
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -56,11 +56,9 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
-      # ./dist/artifact/${{ matrix.platform }}.zip.sha256
+
       # This is needed because overwriting the CHECKSUM file can cause a 422 error on occasion
       - name: Upload Checksum
-        # # only upload the checksum once. we don't need a matrix upload here
-        # if: ${{ matrix.platform == 'linux-glibc-x64' }}
         id: upload_checksum
         uses: softprops/action-gh-release@v1
         env:
