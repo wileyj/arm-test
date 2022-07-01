@@ -55,4 +55,4 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             ./dist/artifact/${{ matrix.platform }}.zip
-            ${{ steps.artifact_checksum.outputs.generated-files }}
+            ./${{ steps.artifact_checksum.outputs.generated-files }}
