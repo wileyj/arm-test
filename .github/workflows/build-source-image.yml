@@ -45,6 +45,7 @@ jobs:
           tags: |
             type=raw,value=${{ env.BRANCH_NAME }}-${{ env.LINUX_VERSION }}
             type=ref,event=pr
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:

@@ -42,6 +42,7 @@ jobs:
             OS_ARCH=${{ matrix.platform }}
             GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
+
       - name: Compress artifact
         id: compress_artifact
         run: zip --junk-paths ${{ matrix.platform }} ./dist/${{ matrix.platform }}/*
