@@ -92,7 +92,6 @@ jobs:
     uses: ./.github/workflows/image-build-debian-source.yml
     needs: github-release
     with:
-      tag: ${{ inputs.tag }}
       docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version: debian
       build_type: source
