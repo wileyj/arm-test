@@ -93,7 +93,6 @@ jobs:
     with:
       docker_platforms: linux/amd64
       linux_version: debian
-      linux_version: debian
       build_type: source
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
