@@ -1,4 +1,4 @@
-name: Build Linux Binary Image
+name: Build Debian Binary Image
 
 on:
   workflow_call:
@@ -6,14 +6,15 @@ on:
       tag:
         required: true
         type: string
-        description: "semver tag for linux images"
+        description: "semver tag for image"
       docker_platforms:
         required: true
-        description: "Arch to buid linux images"
+        description: "Image architecture(s) to build"
         type: string
+        default: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version:
         required: true
-        description: "Linux image to build"
+        description: "Linux version"
         type: string
         default: debian
     secrets:
