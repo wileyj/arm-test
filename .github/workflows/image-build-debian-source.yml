@@ -1,15 +1,11 @@
-name: Build Linux Binary Image
+name: Build Linux Source Image
 
 on:
   workflow_call:
     inputs:
-      tag:
-        required: true
-        type: string
-        description: "semver tag for linux images"
       docker_platforms:
         required: true
-        description: "Arch to buid linux images"
+        description: "Arch to buid images"
         type: string
       linux_version:
         required: true
@@ -24,7 +20,6 @@ on:
 
 jobs:
   image:
-    if: ${{ inputs.tag != '' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -34,6 +29,7 @@ jobs:
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
       - name: Set up QEMU
         id: docker_qemu
         uses: docker/setup-qemu-action@v2
@@ -44,8 +40,15 @@ jobs:
 
       # extract branch name NOT a pull request
       - name: Extract branch name
+        if: ${{ github.event_name != 'pull_request' }}
         id: extract_branch
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      # extract branch name on pull request
+      - name: PR branch name
+        if: ${{ github.event_name == 'pull_request' }}
+        id: pr_extract_branch
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
 
       - name: Docker Metadata
         id: docker_metadata
@@ -54,10 +57,9 @@ jobs:
           images: |
             wileyj/${{ github.event.repository.name }}
           tags: |
-            type=raw,value=latest-${{ inputs.linux_version }},enable=${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) )}}
-            type=raw,value=${{ inputs.tag }}-${{ inputs.linux_version }},enable=${{ inputs.tag != '' }}
             type=raw,value=${{ env.BRANCH_NAME }}-${{ inputs.linux_version }}
             type=ref,event=pr
+
       - name: Login to DockerHub
         id: docker_login
         uses: docker/login-action@v2
@@ -69,14 +71,12 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v3
         with:
-          file: ./.github/actions/dockerhub/Dockerfile.${{ inputs.linux_version }}-binary
+          file: ./.github/actions/dockerhub/Dockerfile.${{ inputs.linux_version }}-source
           platforms: ${{ inputs.docker_platforms }}
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
           build-args: |
-            TAG=${{ inputs.tag}}
-            STACKS_NODE_VERSION=${{ inputs.tag || env.GITHUB_SHA_SHORT }}
+            STACKS_NODE_VERSION=${{ env.GITHUB_SHA_SHORT }}
             GIT_BRANCH=${{ env.GITHUB_REF_SHORT }}
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
-            BUILDKIT_PROGRESS=plain
           push: true
