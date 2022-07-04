@@ -91,7 +91,7 @@ jobs:
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-image.yml@master
     uses: ./.github/workflows/image-build-debian-source.yml
     with:
-      docker_platforms: linux/amd64
+      docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version: debian
       build_type: source
     secrets:
