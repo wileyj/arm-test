@@ -1,4 +1,4 @@
-name: Build Debian Binary Image
+name: Build Linux Binary Image
 
 on:
   workflow_call:
@@ -6,15 +6,14 @@ on:
       tag:
         required: true
         type: string
-        description: "semver tag for image"
+        description: "semver tag for linux images"
       docker_platforms:
         required: true
-        description: "Image architecture(s) to build"
+        description: "Arch to buid linux images"
         type: string
-        default: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version:
         required: true
-        description: "Linux version"
+        description: "Linux image to build"
         type: string
         default: debian
     secrets:
@@ -35,7 +34,6 @@ jobs:
         run: |
           echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
           echo "GITHUB_REF_SHORT=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
       - name: Set up QEMU
         id: docker_qemu
         uses: docker/setup-qemu-action@v2
@@ -60,7 +58,6 @@ jobs:
             type=raw,value=${{ inputs.tag }}-${{ inputs.linux_version }},enable=${{ inputs.tag != '' }}
             type=raw,value=${{ env.BRANCH_NAME }}-${{ inputs.linux_version }}
             type=ref,event=pr
-
       - name: Login to DockerHub
         id: docker_login
         uses: docker/login-action@v2
