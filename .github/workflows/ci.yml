@@ -4,6 +4,10 @@ on:
   # push:
   #   tags:
   #     - "**" # match all tag names
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+.[0-9]+"
+
   pull_request:
   workflow_dispatch:
     inputs:
