@@ -1,18 +1,18 @@
 name: Security Audit
 
 on:
-  push:
-    paths:
-      - "**/Cargo.toml"
-      - "**/Cargo.lock"
-  pull_request:
+  # push:
+  #   paths:
+  #     - "**/Cargo.toml"
+  #     - "**/Cargo.lock"
+  # pull_request:
   workflow_call:
   # schedule:
   #   - cron: "30 15 * * *" # UTC
 
 jobs:
   leaked-cred-test:
-    if: ${{ github.event_name != 'pull_request' }}
+    # if: ${{ github.event_name != 'pull_request' }}
     name: Leaked Credential Test
     runs-on: ubuntu-latest
     steps:
