@@ -1,0 +1,20 @@
+name: Rust Security audit
+# on:
+#   push:
+#     paths:
+#       - "**/Cargo.toml"
+#       - "**/Cargo.lock"
+on:
+  workflow_call:
+  schedule:
+    - cron: "0 * * * *" #  every hour
+
+jobs:
+  security_audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
