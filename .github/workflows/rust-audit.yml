@@ -5,17 +5,30 @@ name: Rust Security audit
 #       - "**/Cargo.toml"
 #       - "**/Cargo.lock"
 on:
-  # workflow_call:
-  schedule:
-    - cron: "0 0 * * *" #  at midnight
+  pull_request:
+  workflow_call:
+  # schedule:
+  #   - cron: "0 0 * * *" #  at midnight
 
 jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Dependency Review
+        id: dep_review
+        uses: actions/dependency-review-action@v2
+        with:
+          fail-on-severity: low
+
   security_audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       # # check for cve's in rust deps
-      - uses: actions-rs/audit-check@v1
+      - name: Rust Dep Check
+        id: rust_dep_check
+        uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

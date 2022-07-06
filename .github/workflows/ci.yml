@@ -70,6 +70,38 @@ jobs:
           base: ${{ env.BRANCH_NAME }}
           head: HEAD
 
+  # rustfmt on every build
+  rustfmt:
+    name: Rust Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set_toolchain
+        id: rust_toolchain
+        run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  # # old rustfmt checking
+  # rustfmt:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Run rustfmt check
+  #       id: rustfmt
+  #       env:
+  #         DOCKER_BUILDKIT: 1
+  #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
+
+  # Rust Audit
+  rust-audit:
+    if: ${{ github.event_name == 'pull_request' }}
+    # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
+    uses: ./.github/workflows/rust-audit.yml
+
   ###############################################
   ## Build Tagged Release
   ###############################################
@@ -77,10 +109,12 @@ jobs:
   # Release Tests
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   release-tests:
-    # if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
     uses: ./.github/workflows/stacks-blockchain-tests.yml
-
+    needs:
+      - rustfmt
+      - leaked-auth-test
   # # Build source binaries
   # #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   # build-source:
@@ -148,6 +182,9 @@ jobs:
   #   if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
   #   # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-image.yml@master
   #   uses: ./.github/workflows/image-build-debian-source.yml
+  #   needs:
+  #     - rustfmt
+  #     - leaked-auth-test
   #   with:
   #     docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
   #     linux_version: debian
