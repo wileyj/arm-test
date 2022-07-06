@@ -47,7 +47,6 @@ jobs:
 
   # check for leaked creds on every run
   leaked-auth-test:
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
