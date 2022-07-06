@@ -52,11 +52,11 @@ jobs:
     # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
     uses: ./.github/workflows/stacks-blockchain-tests.yml
 
-  rust:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
-    if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull') }}
-    # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
-    uses: ./.github/workflows/rust-audit.yml
+  # rust:
+  #   # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
+  #   if: ${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull') }}
+  #   # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
+  #   uses: ./.github/workflows/rust-audit.yml
 
   security:
     # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
