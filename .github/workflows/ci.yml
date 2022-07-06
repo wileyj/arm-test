@@ -45,30 +45,57 @@ jobs:
   #       id: set_tag_auto
   #       run: echo "TAG_NAME=$(echo ${steps.tag_version.outputs.new_tag})" >> $GITHUB_ENV
 
+  # rustfmt on every run
+  rustfmt:
+    name: Rust Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set_toolchain
+        id: rust_toolchain
+        run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  ###############################################
+  ## Build Tagged Release
+  ###############################################
   # Release Tests
+  #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   release-tests:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
     uses: ./.github/workflows/stacks-blockchain-tests.yml
+    # needs:
+    #   - rustfmt
 
-  # ########################################################################
-  # ## Build Tagged Release
-  # ########################################################################
+  audit:
+    if: ${{ inputs.tag != '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
+    uses: ./.github/workflows/audit.yml
+
+  # Build source binaries
+  #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   build-source:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/build-source-binary.yml
-    needs: release-tests
+    needs:
+      - release-tests
+      - rustfmt
+      - audit
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
       arch: >-
         ["linux-glibc-x64", "linux-musl-x64", "linux-glibc-arm64", "linux-musl-arm64", "macos-x64", "macos-arm64", "windows-x64"]
 
+  # Create github release with binary archives
+  #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   github-release:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/github-release.yml@master
     uses: ./.github/workflows/github-release.yml
@@ -80,8 +107,9 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  # Create docker alpine images
+  #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   docker-alpine:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-alpine.yml@master
     uses: ./.github/workflows/image-build-alpine-binary.yml
@@ -93,8 +121,9 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+  # Create docker debian images
+  #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   docker-debian:
-    # Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-debian.yml@master
     uses: ./.github/workflows/image-build-debian-binary.yml
@@ -108,14 +137,17 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-  ########################################################################
+  ###############################################
   ## Build Branch/PR
-  ########################################################################
+  ###############################################
+  # Create docker debian images
+  #   Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR) or (this is a PR with no input tag)
   build-branch:
-    # Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR)
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-image.yml@master
     uses: ./.github/workflows/image-build-debian-source.yml
+    needs:
+      - rustfmt
     with:
       docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version: debian
@@ -123,3 +155,14 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  # # # notify discord?
+  # # # https://github.com/marketplace/actions/notify-discord
+  # # - name: Notify discord
+  # #   uses: th0th/notify-discord@v0.4.1
+  # #   if: ${{ always() }}
+  # #   env:
+  # #     DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+  # #     GITHUB_ACTOR: ${{ github.actor }}
+  # #     GITHUB_JOB_NAME: "Build and deploy"
+  # #     GITHUB_JOB_STATUS: ${{ job.status }}
