@@ -15,14 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # # check for leaked creds
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@v3.4.3
-        with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-
       # # check for cve's in rust deps
       - uses: actions-rs/audit-check@v1
         with:

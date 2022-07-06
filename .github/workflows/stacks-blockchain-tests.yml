@@ -93,13 +93,71 @@ jobs:
   #         files: ./coverage.lcov
   #         verbose: true
 
-  # rustfmt checking
-  rustfmt:
+  # # rustfmt checking
+  # rustfmt:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Run rustfmt check
+  #       id: rustfmt
+  #       env:
+  #         DOCKER_BUILDKIT: 1
+  #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
+
+  # check for leaked creds
+  leaked-auth-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run rustfmt check
-        id: rustfmt
-        env:
-          DOCKER_BUILDKIT: 1
-        run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
+      # extract branch name NOT a pull request
+      - name: Extract branch name
+        if: ${{ github.event_name != 'pull_request' }}
+        id: extract_branch
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      # extract branch name on pull request
+      - name: PR branch name
+        if: ${{ github.event_name == 'pull_request' }}
+        id: pr_extract_branch
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.4.3
+        with:
+          path: ./
+          # base: ${{ github.event.repository.default_branch }}
+          base: ${{ env.BRANCH_NAME }}
+          head: HEAD
+
+  # rustfmt checking
+  rustftmt:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          # toolchain: stable # required if no ./rust-toolchain file
+          components: rustfmt
+          override: true
+      - uses: LoliGothick/rustfmt-check@v0.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          flags: --all
+          options: --manifest-path=Cargo.toml
+
+  print_doc_coverage:
+    name: Print documentation coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        # with:
+        #   toolchain: nightly # required if no ./rust-toolchain file
+      - id: coverage
+        uses: bewee/rustdoc-coverage-action@v1
+        with:
+          working-directory: ./src
+          store-report: true
+          calculate-diff: true
+      - run: echo ${{ steps.coverage.outputs.documented }}
