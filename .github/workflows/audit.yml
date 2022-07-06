@@ -1,4 +1,4 @@
-name: Rust Security audit
+name: Security audit
 
 on:
   push:
@@ -37,6 +37,7 @@ jobs:
 
   dependency-review:
     if: ${{ github.event_name == 'pull_request' }}
+    name: Dependency Review
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -47,6 +48,7 @@ jobs:
           fail-on-severity: critical
 
   security_audit:
+    name: Crate Vulnerability Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
