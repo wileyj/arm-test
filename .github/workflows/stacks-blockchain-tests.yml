@@ -130,6 +130,7 @@ jobs:
           head: HEAD
 
   dependency-review:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -137,3 +138,25 @@ jobs:
         uses: actions/dependency-review-action@v2
         with:
           fail-on-severity: low
+
+  format:
+    name: rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: set_toolchain
+        id: rust_toolchain
+        run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt
+          override: true
+      - uses: LoliGothick/rustfmt-check@v0.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          flags: --all
+          # options: --manifest-path=Cargo.toml
+          args: --check
+          # args: --config-path=rustfmt.toml
