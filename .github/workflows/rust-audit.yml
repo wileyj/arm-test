@@ -6,9 +6,9 @@ name: Rust Security audit
 #       - "**/Cargo.lock"
 on:
   pull_request:
-  workflow_call:
+  # workflow_call:
   # schedule:
-  #   - cron: "0 0 * * *" #  at midnight
+  #   - cron: "30 15 * * *" # UTC
 
 jobs:
   dependency-review:
@@ -19,7 +19,7 @@ jobs:
         id: dep_review
         uses: actions/dependency-review-action@v2
         with:
-          fail-on-severity: low
+          fail-on-severity: critical
 
   security_audit:
     runs-on: ubuntu-latest
