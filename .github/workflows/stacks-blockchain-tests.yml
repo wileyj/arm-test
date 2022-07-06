@@ -153,10 +153,6 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt
           override: true
-      - uses: LoliGothick/rustfmt-check@v0.2
+      - uses: mbrobbel/rustfmt-check@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --unstable-features
-          # args: --unstable-features
-          # options: --unstable-features
-          # args: --config-path=rustfmt.toml
