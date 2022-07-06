@@ -93,13 +93,13 @@ jobs:
   #         files: ./coverage.lcov
   #         verbose: true
 
-  # # rustfmt checking
-  # rustfmt:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Run rustfmt check
-  #       id: rustfmt
-  #       env:
-  #         DOCKER_BUILDKIT: 1
-  #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
+  # # # rustfmt checking
+  # # rustfmt:
+  # #   runs-on: ubuntu-latest
+  # #   steps:
+  # #     - uses: actions/checkout@v3
+  # #     - name: Run rustfmt check
+  # #       id: rustfmt
+  # #       env:
+  # #         DOCKER_BUILDKIT: 1
+  # #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
