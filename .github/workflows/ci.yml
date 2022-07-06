@@ -93,9 +93,9 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
     uses: ./.github/workflows/stacks-blockchain-tests.yml
-    needs:
-      - rustfmt
-      - leaked-auth-test
+    # needs:
+    #   - rustfmt
+    #   - leaked-auth-test
 
   # Build source binaries
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
@@ -103,7 +103,10 @@ jobs:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/build-source-binary.yml
-    needs: release-tests
+    needs:
+      - release-tests
+      - rustfmt
+      - leaked-auth-test
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
