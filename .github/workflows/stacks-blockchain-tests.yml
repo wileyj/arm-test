@@ -156,7 +156,8 @@ jobs:
       - uses: LoliGothick/rustfmt-check@v0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          flags: --unstable-features
+          flags: ""
           options: --all
+          args: --unstable-features
           # options: --unstable-features
           # args: --config-path=rustfmt.toml
