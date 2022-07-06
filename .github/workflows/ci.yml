@@ -51,14 +51,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: set_toolchain
-        id: rust_toolchain
-        run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          components: rustfmt
-      - run: cargo fmt --all -- --check
+      # - name: set_toolchain
+      #   id: rust_toolchain
+      #   run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
+      # - uses: actions-rust-lang/setup-rust-toolchain@v1
+      #   with:
+      #     toolchain: ${{ env.RUST_TOOLCHAIN }}
+      #     components: rustfmt
+      # - run: cargo fmt --all -- --check
 
   ###############################################
   ## Build Tagged Release
@@ -75,7 +75,7 @@ jobs:
   audit:
     # if: ${{ inputs.tag != '' || github.event_name == 'pull_request' }}
     # if: ${{ inputs.tag != '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    if: ${{ inputs.tag != '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && contains(github.ref, 'refs/pull')) }}
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/audit.yml
 
