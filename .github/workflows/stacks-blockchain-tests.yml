@@ -157,6 +157,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           flags: --all
-          options: --unstable-features
-          args: --check
+          options: --check
+          args: --unstable-features
           # args: --config-path=rustfmt.toml
