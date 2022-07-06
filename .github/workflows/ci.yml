@@ -45,30 +45,6 @@ jobs:
   #       id: set_tag_auto
   #       run: echo "TAG_NAME=$(echo ${steps.tag_version.outputs.new_tag})" >> $GITHUB_ENV
 
-  # check for leaked creds on every run
-  leaked-auth-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      # extract branch name NOT a pull request
-      - name: Extract branch name
-        if: ${{ github.event_name != 'pull_request' }}
-        id: extract_branch
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-
-      # extract branch name on pull request
-      - name: PR branch name
-        if: ${{ github.event_name == 'pull_request' }}
-        id: pr_extract_branch
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
-
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@v3.4.3
-        with:
-          path: ./
-          base: ${{ env.BRANCH_NAME }}
-          head: HEAD
-
   # rustfmt on every run
   rustfmt:
     name: Rust Format
@@ -95,7 +71,11 @@ jobs:
     uses: ./.github/workflows/stacks-blockchain-tests.yml
     # needs:
     #   - rustfmt
-    #   - leaked-auth-test
+
+  audit:
+    if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
+    uses: ./.github/workflows/audit.yml
 
   # Build source binaries
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
@@ -106,7 +86,7 @@ jobs:
     needs:
       - release-tests
       - rustfmt
-      - leaked-auth-test
+      - audit
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
@@ -168,7 +148,6 @@ jobs:
     uses: ./.github/workflows/image-build-debian-source.yml
     needs:
       - rustfmt
-      - leaked-auth-test
     with:
       docker_platforms: linux/amd64, linux/amd64/v2, linux/amd64/v3
       linux_version: debian
