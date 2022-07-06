@@ -5,6 +5,7 @@ name: Rust Security audit
 #       - "**/Cargo.toml"
 #       - "**/Cargo.lock"
 on:
+  workflow_call:
   schedule:
     - cron: "0 * * * *" #  every hour
 
