@@ -93,53 +93,53 @@ jobs:
   #         files: ./coverage.lcov
   #         verbose: true
 
-  # rustfmt checking
+  # # rustfmt checking
+  # rustfmt:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Run rustfmt check
+  #       id: rustfmt
+  #       env:
+  #         DOCKER_BUILDKIT: 1
+  #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
+
+  # # check for leaked creds
+  # leaked-auth-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     # extract branch name NOT a pull request
+  #     - name: Extract branch name
+  #       if: ${{ github.event_name != 'pull_request' }}
+  #       id: extract_branch
+  #       run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+  #     # extract branch name on pull request
+  #     - name: PR branch name
+  #       if: ${{ github.event_name == 'pull_request' }}
+  #       id: pr_extract_branch
+  #       run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
+
+  #     - name: TruffleHog OSS
+  #       uses: trufflesecurity/trufflehog@v3.4.3
+  #       with:
+  #         path: ./
+  #         # base: ${{ github.event.repository.default_branch }}
+  #         base: ${{ env.BRANCH_NAME }}
+  #         head: HEAD
+
+  # dependency-review:
+  #   if: ${{ github.event_name == 'pull_request' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Dependency Review
+  #       uses: actions/dependency-review-action@v2
+  #       with:
+  #         fail-on-severity: low
+
   rustfmt:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run rustfmt check
-        id: rustfmt
-        env:
-          DOCKER_BUILDKIT: 1
-        run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.rustfmt .
-
-  # check for leaked creds
-  leaked-auth-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      # extract branch name NOT a pull request
-      - name: Extract branch name
-        if: ${{ github.event_name != 'pull_request' }}
-        id: extract_branch
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-
-      # extract branch name on pull request
-      - name: PR branch name
-        if: ${{ github.event_name == 'pull_request' }}
-        id: pr_extract_branch
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
-
-      - name: TruffleHog OSS
-        uses: trufflesecurity/trufflehog@v3.4.3
-        with:
-          path: ./
-          # base: ${{ github.event.repository.default_branch }}
-          base: ${{ env.BRANCH_NAME }}
-          head: HEAD
-
-  dependency-review:
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v2
-        with:
-          fail-on-severity: low
-
-  format:
     name: rustfmt
     runs-on: ubuntu-latest
     steps:
