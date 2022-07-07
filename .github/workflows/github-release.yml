@@ -16,6 +16,7 @@ on:
 jobs:
   create-release:
     if: ${{ inputs.tag != '' }}
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts

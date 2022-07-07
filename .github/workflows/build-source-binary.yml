@@ -17,6 +17,7 @@ on:
 jobs:
   artifact:
     if: ${{ inputs.tag != '' }}
+    name: Create Artifacts
     runs-on: ubuntu-latest
     strategy:
       max-parallel: ${{ inputs.parallel_jobs}}

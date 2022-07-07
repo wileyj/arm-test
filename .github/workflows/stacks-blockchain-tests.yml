@@ -6,6 +6,7 @@ on:
 jobs:
   # Run full genesis test
   full-genesis:
+    name: Full Genesis Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -30,6 +31,7 @@ jobs:
   #
   # Run unit tests with code coverage
   unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -52,6 +54,7 @@ jobs:
   #         fail_ci_if_error: true
   #
   open-api-validation:
+    name: OpenAPI Validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -75,6 +78,7 @@ jobs:
     # disable this job/test for now, since we haven't seen this pass
     #  on github actions in a while, and the failures can take > 4 hours
     if: ${{ false }}
+    name: Net Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -87,6 +91,7 @@ jobs:
   #       run: docker build -f ./.github/actions/bitcoin-int-tests/Dockerfile.net-tests .
 
   core-contracts-clarinet-test:
+    name: Core Contracts Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
