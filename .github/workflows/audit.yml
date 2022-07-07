@@ -6,7 +6,7 @@ on:
       - "**/Cargo.toml"
       - "**/Cargo.lock"
   schedule:
-    - cron: "15 03 * * *"
+    - cron: 30 03 * * *
 
 jobs:
   leaked-cred-test:
