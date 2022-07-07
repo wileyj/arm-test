@@ -13,7 +13,9 @@ jobs:
     name: Leaked Credential Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        id: git_checkout
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@v3.4.3
@@ -26,7 +28,9 @@ jobs:
     name: Crate Vulnerability Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        id: git_checkout
 
       - name: Rust Dep Check
         uses: actions-rs/audit-check@v1
