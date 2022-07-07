@@ -1,9 +1,9 @@
+name: Clippy Check
 on:
   pull_request:
 
 jobs:
   clippy_check:
-    name: Clippy Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
