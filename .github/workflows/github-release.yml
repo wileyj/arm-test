@@ -17,11 +17,6 @@ jobs:
   create-release:
     if: ${{ inputs.tag != '' }}
     runs-on: ubuntu-latest
-    # strategy:
-    #   max-parallel: 4
-    #   matrix:
-    #     platform: ${{fromJson(inputs.arch)}}
-
     steps:
       - name: Download Artifacts
         id: download_artifacts
