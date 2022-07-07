@@ -14,10 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v3
         id: git_checkout
+        uses: actions/checkout@v3
 
-      - name: TruffleHog OSS
+      - name: TruffleHog Scan
+        id: trufflehog_check
         uses: trufflesecurity/trufflehog@v3.4.3
         with:
           path: ./
@@ -29,10 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v3
         id: git_checkout
+        uses: actions/checkout@v3
 
-      - name: Rust Dep Check
+      - name: Rust Dependency Check
+        id: rust_dep_check
         uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

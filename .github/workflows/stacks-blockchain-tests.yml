@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v3
         id: git_checkout
+        uses: actions/checkout@v3
 
   #     - name: Single full genesis integration test
   #       id: full_genesis_test
@@ -32,7 +32,9 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
   #     - name: Run units tests (with coverage)
   #       id: unit_tests_codecov
   #       env:
@@ -52,7 +54,9 @@ jobs:
   open-api-validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
   #     - name: Run units tests (with coverage)
   #       id: api_codecov
   #       env:
@@ -73,7 +77,9 @@ jobs:
     if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
   #     - name: Run network relay tests
   #       id: nettest
   #       env:
@@ -83,7 +89,9 @@ jobs:
   core-contracts-clarinet-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
   #     - name: Execute core contract unit tests in Clarinet
   #       id: clarinet_unit_test
   #       uses: docker://hirosystems/clarinet:latest

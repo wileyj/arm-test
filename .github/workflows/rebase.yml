@@ -15,12 +15,14 @@ jobs:
       )
     steps:
       - name: Checkout the latest code
+        id: git_checkout
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0 # otherwise, you will fail to push refs to dest repo
 
       - name: Automatic Rebase
+        id: automatic_rebase
         uses: cirrus-actions/rebase@1.7
         with:
           autosquash: ${{ contains(github.event.comment.body, '/autosquash') || contains(github.event.comment.body, '/rebase-autosquash') }}
