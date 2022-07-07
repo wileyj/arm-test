@@ -24,7 +24,10 @@ jobs:
         platform: ${{fromJson(inputs.arch)}}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        id: git_checkout
+
       - name: Set Vars
         id: set_vars
         run: |

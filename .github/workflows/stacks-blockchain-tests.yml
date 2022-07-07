@@ -8,7 +8,10 @@ jobs:
   full-genesis:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        id: git_checkout
+
   #     - name: Single full genesis integration test
   #       id: full_genesis_test
   #       env:

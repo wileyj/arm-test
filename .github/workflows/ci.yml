@@ -50,7 +50,9 @@ jobs:
     name: Rust Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout the latest code
+        uses: actions/checkout@v3
+        id: git_checkout
 
       - name: set_toolchain
         id: rust_toolchain
@@ -82,7 +84,6 @@ jobs:
     needs:
       - release-tests
       - rustfmt
-      # - audit
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
@@ -151,14 +152,3 @@ jobs:
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-  # # # notify discord?
-  # # # https://github.com/marketplace/actions/notify-discord
-  # # - name: Notify discord
-  # #   uses: th0th/notify-discord@v0.4.1
-  # #   if: ${{ always() }}
-  # #   env:
-  # #     DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-  # #     GITHUB_ACTOR: ${{ github.actor }}
-  # #     GITHUB_JOB_NAME: "Build and deploy"
-  # #     GITHUB_JOB_STATUS: ${{ job.status }}
