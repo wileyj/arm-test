@@ -69,7 +69,7 @@ jobs:
         id: rustfmt
         run: cargo fmt --all -- --check
 
-  # Checked for leaked credentials if tag is provided, or this is a build of the default branch
+  # Checked for leaked credentials if tag is provided and this is a build of the default branch
   leaked-cred-test:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Leaked Credential Test
@@ -108,6 +108,7 @@ jobs:
     needs:
       - release-tests
       - rustfmt
+      - leaked-cred-test
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
