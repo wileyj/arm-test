@@ -4,7 +4,6 @@ on:
 name: Clippy Check
 jobs:
   clippy_check:
-    name: Clippy Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
