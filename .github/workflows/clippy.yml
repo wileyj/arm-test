@@ -20,7 +20,7 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: clippy
 
-      - name: Run Clippy
+      - name: Clippy
         id: clippy
         uses: actions-rs/clippy-check@v1
         with:
