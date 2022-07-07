@@ -51,19 +51,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
-        uses: actions/checkout@v3
         id: git_checkout
+        uses: actions/checkout@v3
 
-      - name: set_toolchain
-        id: rust_toolchain
+      - name: Define Rust Toolchain
+        id: define_rust_toolchain
         run: echo "RUST_TOOLCHAIN=$(cat ./rust-toolchain)" >> $GITHUB_ENV
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Setup Rust Toolchain
+        id: setup_rust_toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt
 
-      - run: cargo fmt --all -- --check
+      - name: rustfmt
+        id: rustfmt
+        run: cargo fmt --all -- --check
 
   ###############################################
   ## Build Tagged Release
@@ -72,6 +76,7 @@ jobs:
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   release-tests:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Release Tests
     # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
     uses: ./.github/workflows/stacks-blockchain-tests.yml
 
@@ -79,6 +84,7 @@ jobs:
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   build-source:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Build Binaries
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/build-source-binary.yml
     needs:
@@ -94,6 +100,7 @@ jobs:
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   github-release:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Github Release
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/github-release.yml@master
     uses: ./.github/workflows/github-release.yml
     needs: build-source
@@ -108,6 +115,7 @@ jobs:
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   docker-alpine:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Docker Alpine (Binary)
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-alpine.yml@master
     uses: ./.github/workflows/image-build-alpine-binary.yml
     needs: github-release
@@ -122,6 +130,7 @@ jobs:
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   docker-debian:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Docker Debian (Binary)
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-debian.yml@master
     uses: ./.github/workflows/image-build-debian-binary.yml
     needs: github-release
@@ -141,6 +150,7 @@ jobs:
   #   Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR) or (this is a PR with no input tag)
   build-branch:
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    name: Docker Debian (Source)
     # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-image.yml@master
     uses: ./.github/workflows/image-build-debian-source.yml
     needs:
