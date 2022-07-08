@@ -1,8 +1,5 @@
 name: CI
 
-env:
-  REPO_OWNER: wileyj
-
 on:
   # push:
   #   tags:
