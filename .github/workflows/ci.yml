@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  REPO_OWNER: wileyj
+
 on:
   # push:
   #   tags:
@@ -95,16 +98,16 @@ jobs:
   release-tests:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Release Tests
-    # uses: wileyj/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
-    uses: ./.github/workflows/stacks-blockchain-tests.yml
+    uses: ${{ env.REPO_OWNER }}/arm-test/.github/workflows/stacks-blockchain-tests.yml@master
+    # uses: ./.github/workflows/stacks-blockchain-tests.yml
 
   # Build source binaries
   #   Only run if (a tag was passed in) -AND- (we're building the main branch which isn't a PR)
   build-source:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Build Binaries
-    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
-    uses: ./.github/workflows/build-source-binary.yml
+    uses: ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}/.github/workflows/build-source-binary.yml@master
+    # uses: ./.github/workflows/build-source-binary.yml
     needs:
       - release-tests
       - rustfmt
@@ -120,8 +123,8 @@ jobs:
   github-release:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Github Release
-    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/github-release.yml@master
-    uses: ./.github/workflows/github-release.yml
+    uses: ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}/.github/workflows/github-release.yml@master
+    # uses: ./.github/workflows/github-release.yml
     needs: build-source
     with:
       tag: ${{ inputs.tag }}
@@ -135,8 +138,8 @@ jobs:
   docker-alpine:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Docker Alpine (Binary)
-    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-alpine.yml@master
-    uses: ./.github/workflows/image-build-alpine-binary.yml
+    uses: ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}/.github/workflows/image-build-alpine-binary.yml@master
+    # uses: ./.github/workflows/image-build-alpine-binary.yml
     needs: github-release
     with:
       tag: ${{ inputs.tag }}
@@ -150,8 +153,8 @@ jobs:
   docker-debian:
     if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Docker Debian (Binary)
-    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/image-build-debian.yml@master
-    uses: ./.github/workflows/image-build-debian-binary.yml
+    uses: ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}/.github/workflows/image-build-debian-binary.yml@master
+    # uses: ./.github/workflows/image-build-debian-binary.yml
     needs: github-release
     with:
       tag: ${{ inputs.tag }}
@@ -170,8 +173,8 @@ jobs:
   build-branch:
     if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Docker Debian (Source)
-    # uses: wileyj/${{ github.event.repository.name }}/.github/workflows/build-source-image.yml@master
-    uses: ./.github/workflows/image-build-debian-source.yml
+    uses: ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}/.github/workflows/image-build-debian-source.yml@master
+    # uses: ./.github/workflows/image-build-debian-source.yml
     needs:
       - rustfmt
     with:

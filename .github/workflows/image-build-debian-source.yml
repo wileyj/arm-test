@@ -1,5 +1,8 @@
 name: Build Linux Source Image
 
+env:
+  REPO_OWNER: wileyj
+
 on:
   workflow_call:
     inputs:
@@ -63,7 +66,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            wileyj/${{ github.event.repository.name }}
+            ${{ env.REPO_OWNER }}/${{ github.event.repository.name }}
           tags: |
             type=raw,value=${{ env.BRANCH_NAME }}-${{ inputs.linux_version }}
             type=ref,event=pr
