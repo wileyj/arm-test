@@ -9,12 +9,12 @@ jobs:
     if: ${false}
     name: Rebase
     runs-on: ubuntu-latest
-    if: >-
-      github.event.issue.pull_request != '' && 
-      (
-        contains(github.event.comment.body, '/rebase') || 
-        contains(github.event.comment.body, '/autosquash')
-      )
+    # if: >-
+    #   github.event.issue.pull_request != '' &&
+    #   (
+    #     contains(github.event.comment.body, '/rebase') ||
+    #     contains(github.event.comment.body, '/autosquash')
+    #   )
     steps:
       - name: Checkout the latest code
         id: git_checkout
