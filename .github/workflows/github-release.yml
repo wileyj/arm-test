@@ -1,4 +1,11 @@
+##
+## Create the github release and store artifact files (with checksum)
+##
+
 name: Github Release
+
+# Only run when:
+#   - manually triggered via the ci.yml workflow
 
 on:
   workflow_call:
@@ -13,6 +20,7 @@ on:
     secrets:
       GH_TOKEN:
         required: true
+
 jobs:
   create-release:
     if: ${{ inputs.tag != '' }}
@@ -25,7 +33,6 @@ jobs:
         with:
           name: artifact
           path: release
-
       - name: Generate Checksums
         id: generate_checksum
         uses: jmgilman/actions-generate-checksum@v1
@@ -33,12 +40,10 @@ jobs:
           output: CHECKSUMS.txt
           patterns: |
             release/*.zip
-
       - name: Display artifact files
         id: list_artifacts
         run: ls -R
         working-directory: release
-
       - name: Upload Release
         id: upload_release
         uses: softprops/action-gh-release@v1
