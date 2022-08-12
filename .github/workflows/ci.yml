@@ -90,7 +90,7 @@ jobs:
     # uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/build-source-binary.yml
     needs:
-      # - release-tests
+      - release-tests
       - rustfmt
     with:
       tag: ${{ inputs.tag }}
