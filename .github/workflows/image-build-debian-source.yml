@@ -4,9 +4,6 @@
 
 name: Build Linux Source Image
 
-env:
-  REPO_OWNER: wileyj
-
 # Only run when:
 #   - workflow is manually triggered
 #   - manually triggered via the ci.yml workflow

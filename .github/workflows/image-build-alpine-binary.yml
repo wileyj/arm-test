@@ -4,9 +4,6 @@
 
 name: Build Alpine Binary Image
 
-env:
-  REPO_OWNER: wileyj
-
 # Only run when:
 #   - manually triggered via the ci.yml workflow
 
