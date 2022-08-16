@@ -67,7 +67,7 @@ jobs:
           images: |
             ${{ github.repository }}
           tags: |
-            type=raw,value=${{ env.BRANCH_NAME }}-${{ inputs.linux_version }}
+            type=raw,value=${{ env.BRANCH_NAME }}
             type=ref,event=pr
       - name: Login to DockerHub
         id: docker_login
