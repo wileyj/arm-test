@@ -36,6 +36,7 @@ on:
 
 jobs:
   image:
+    # Only run if a tag is provided manually
     if: ${{ inputs.tag != '' }}
     name: Build Image
     runs-on: ubuntu-latest
