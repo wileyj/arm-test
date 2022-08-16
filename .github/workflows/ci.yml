@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # rustfmt on every run
+  # Run rustfmt on every run
   rustfmt:
     name: Rust Format
     runs-on: ubuntu-latest
