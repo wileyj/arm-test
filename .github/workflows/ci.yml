@@ -9,13 +9,7 @@ on:
   push:
     branches:
       - master
-  #   # trigger on a pushed tag
-  #   tags:
-  #     - "**"
   pull_request:
-    types:
-      - opened
-      - reopened
   workflow_dispatch:
     inputs:
       tag:
