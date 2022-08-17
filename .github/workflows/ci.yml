@@ -6,9 +6,9 @@ name: CI
 #   - push to master
 
 on:
-  # push:
-  #   branches:
-  #     - master
+  push:
+    branches:
+      - master
   #   # trigger on a pushed tag
   #   tags:
   #     - "**"
