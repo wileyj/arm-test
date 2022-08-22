@@ -56,8 +56,16 @@ jobs:
     name: Leaked Credential Test
     runs-on: ubuntu-latest
     steps:
+      - name: Extract branch name
+        id: extract_branch
+        if: ${{ github.event_name != 'pull_request' }}
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+      - name: Extract branch name
+        id: extract_branch_pr
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF})" >> $GITHUB_ENV
       - name: Branch name
-        run: echo running on branch ${GITHUB_REF##*/}
+        run: echo running on branch ${{ env.BRANCH_NAME }}
       - name: Checkout the latest code
         id: git_checkout
         uses: actions/checkout@v3
@@ -66,7 +74,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${GITHUB_REF##*/}
+          base: ${{ env.BRANCH_NAME }}
           head: HEAD
       # - name: TruffleHog Scan
       #   id: trufflehog_check
