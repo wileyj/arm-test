@@ -44,10 +44,10 @@ jobs:
 
   # Checked for leaked credentials
   # Only run if:
-  #    - tag is provided -AND- this is a build of the default branch
+  #    - tag is provided -OR- this is a build of the default branch
   leaked-cred-test:
     # if: ${{ inputs.tag != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
-    if: ${{ inputs.tag != '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
+    if: ${{ inputs.tag != '' || (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
     name: Leaked Credential Test
     runs-on: ubuntu-latest
     steps:
@@ -70,7 +70,7 @@ jobs:
   # Release Tests
   # Only run if:
   #    - tag is provided
-  #    - AND
+  #    - OR
   #        - this is the default branch
   #        - AND Not a PR
   release-tests:
@@ -82,7 +82,7 @@ jobs:
   # Build source binaries
   # Only run if:
   #    - tag is provided
-  #    - AND
+  #    - OR
   #        - this is the default branch
   #        - AND Not a PR
   build-source:
@@ -103,7 +103,7 @@ jobs:
   # Create github release with binary archives
   # Only run if:
   #    - tag is provided
-  #    - AND
+  #    - OR
   #        - this is the default branch
   #        - AND Not a PR
   github-release:
@@ -123,7 +123,7 @@ jobs:
   # Create docker alpine images
   # Only run if:
   #    - tag is provided
-  #    - AND
+  #    - OR
   #        - this is the default branch
   #        - AND Not a PR
   docker-alpine:
@@ -143,7 +143,7 @@ jobs:
   # Create docker debian images
   # Only run if:
   #    - tag is provided
-  #    - AND
+  #    - OR
   #        - this is the default branch
   #        - AND Not a PR
   docker-debian:
@@ -169,9 +169,6 @@ jobs:
   #   Only run if (a tag was NOT passed in) or (we're building a non-master branch which isn't a PR) or (this is a PR with no input tag)
   # Only run if:
   #    - tag is not provided
-  #    - OR
-  #        - non-default branch
-  #        - AND Not a PR
   build-branch:
     if: ${{ inputs.tag == '' }}
     # if: ${{ inputs.tag == '' || (github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !contains(github.ref, 'refs/pull')) }}
