@@ -74,8 +74,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          head: ${{ env.BRANCH_NAME }}
-          base: HEAD
+          base: ${{ env.BRANCH_NAME }}
       # - name: TruffleHog Scan
       #   id: trufflehog_check
       #   uses: trufflesecurity/trufflehog@main
