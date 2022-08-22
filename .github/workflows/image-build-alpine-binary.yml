@@ -48,7 +48,7 @@ jobs:
       # tag image with:
       #   latest: `latest`
       #   input tag: `<input tag>`
-      #   git tag: `1234``
+      #   git tag: `1234`
       - name: Docker Metadata
         id: docker_metadata
         uses: docker/metadata-action@v4
