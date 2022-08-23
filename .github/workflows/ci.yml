@@ -92,8 +92,9 @@ jobs:
     # uses: wileyj/arm-test/.github/workflows/build-source-binary.yml@master
     uses: ./.github/workflows/build-source-binary.yml
     needs:
-      - release-tests
       - rustfmt
+      - release-tests
+      - leaked-cred-test
     with:
       tag: ${{ inputs.tag }}
       parallel_jobs: 4
@@ -175,6 +176,7 @@ jobs:
     uses: ./.github/workflows/image-build-debian-source.yml
     needs:
       - rustfmt
+      - leaked-cred-test
     with:
       docker_platforms: linux/amd64
       linux_version: debian
