@@ -74,8 +74,8 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: ${{ env.BRANCH_NAME }}
+          base: ${{ env.BRANCH_NAME }}
+          head: ${{ github.event.repository.default_branch }}
       # - name: TruffleHog Scan
       #   id: trufflehog_check
       #   uses: trufflesecurity/trufflehog@main
