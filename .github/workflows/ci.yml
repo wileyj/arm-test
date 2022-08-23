@@ -69,12 +69,16 @@ jobs:
       - name: Checkout the latest code
         id: git_checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: TruffleHog Scan
         id: trufflehog_check
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: "${{ env.BRANCH_NAME }}"
+          base: ${{ env.BRANCH_NAME }}
+          # base: ${{ github.event.repository.default_branch }}
+          head: HEAD
       # - name: TruffleHog Scan
       #   id: trufflehog_check
       #   uses: trufflesecurity/trufflehog@main
