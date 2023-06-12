@@ -41,7 +41,7 @@ jobs:
 
       - name: Cargo List
         run: |
-          cargo list
+          cargo --list
 
       - name: ls
         run: |
