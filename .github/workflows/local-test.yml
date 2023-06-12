@@ -30,12 +30,22 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
-      - name: Cargo Build
-        id: cargo_build
+      - name: Nextest
+        id: cargo_nextest
         uses: actions-rs/cargo@v1
         env:
           RUSTFLAGS: "-Cinstrument-coverage"
           LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
         with:
-          command: build
+          command: nextest run
           args: --workspace
+
+      # - name: Cargo Build
+      #   id: cargo_build
+      #   uses: actions-rs/cargo@v1
+      #   env:
+      #     RUSTFLAGS: "-Cinstrument-coverage"
+      #     LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
+      #   with:
+      #     command: build
+      #     args: --workspace
