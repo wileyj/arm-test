@@ -1,0 +1,13 @@
+name: Local Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  full-genesis:
+    name: Full Genesis Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
