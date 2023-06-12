@@ -30,10 +30,6 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
-      # - name: Install nextest
-      #   uses: baptiste0928/cargo-install@v2
-      #   with:
-      #     crate: nextest
       - name: Install nextest
         id: install_nextest
         run: |
@@ -48,14 +44,10 @@ jobs:
           ls -al /home/runner/.cargo/bin
 
       - name: Nextest
-        id: cargo_nextest
-        uses: actions-rs/cargo@v1
         env:
           RUSTFLAGS: "-Cinstrument-coverage"
           LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-        with:
-          command: nextest run
-          args: --workspace
+        run: cargo nextest run --workspace
 
       # - name: Cargo Build
       #   id: cargo_build
