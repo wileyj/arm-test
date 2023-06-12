@@ -30,24 +30,35 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
-      - name: Install nextest
-        id: install_nextest
-        run: |
-          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+      - uses: SierraSoftworks/setup-grcov@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
 
-      - name: Cargo List
-        run: |
-          cargo --list
-
-      - name: ls
-        run: |
-          ls -al /home/runner/.cargo/bin
-
-      - name: Nextest
+      - name: Run tests
+        id: nextest
         env:
           RUSTFLAGS: "-Cinstrument-coverage"
           LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-        run: cargo nextest run --workspace
+        run: |
+          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+          cargo nextest run --workspace
+
+      # - name: Nextest
+      #   id: run_nextest
+      #   env:
+      #     RUSTFLAGS: "-Cinstrument-coverage"
+      #     LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
+      #   run: cargo nextest run --workspace
+
+      - name: grcov
+        id: grcov
+        run: grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+
+      # - uses: codecov/codecov-action@v1
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     file: ./lcov.info
 
       # - name: Cargo Build
       #   id: cargo_build
