@@ -30,10 +30,14 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
+      # - name: Install nextest
+      #   uses: baptiste0928/cargo-install@v2
+      #   with:
+      #     crate: nextest
       - name: Install nextest
-        uses: baptiste0928/cargo-install@v2
-        with:
-          crate: nextest
+        id: install_nextest
+        run: |
+          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
       - name: Nextest
         id: cargo_nextest
