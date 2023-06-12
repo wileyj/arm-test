@@ -39,6 +39,14 @@ jobs:
         run: |
           curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
+      - name: Cargo List
+        run: |
+          cargo list
+
+      - name: ls
+        run: |
+          ls -al /home/runner/.cargo/bin
+
       - name: Nextest
         id: cargo_nextest
         uses: actions-rs/cargo@v1
