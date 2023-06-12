@@ -30,6 +30,11 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
+      - name: Install nextest
+        uses: baptiste0928/cargo-install@v2
+        with:
+          crate: nextest
+
       - name: Nextest
         id: cargo_nextest
         uses: actions-rs/cargo@v1
