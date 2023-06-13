@@ -8,15 +8,11 @@ on:
   workflow_dispatch:
 
 env:
-  RUSTFLAGS: "-Cinstrument-coverage"
-  LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
+  BTC_VERSION: "0.20.0"
 
 jobs:
-  full-genesis:
-    env:
-      RUSTFLAGS: "-Cinstrument-coverage"
-      LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-    name: Full Genesis Test
+  sampled-genesis:
+    name: Sampled Genesis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the latest code
@@ -28,6 +24,12 @@ jobs:
         with:
           toolchain: stable
           components: llvm-tools-preview
+
+      - name: Install Bitcoin Binary
+        id: bitcoin_binary
+        run: |
+          curl -LSf https://bitcoin.org/bin/bitcoin-core-${{BTC_VERSION}}/bitcoin-${{BTC_VERSION}}-x86_64-linux-gnu.tar.gz | tar zxf - -C /tmp
+          ln -s /tmp/bitcoin-${{BTC_VERSION}}/bin/bitcoind /bin/
 
       - name: Install grcov
         id: install_grcov
