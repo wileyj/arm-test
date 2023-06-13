@@ -36,11 +36,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
 
-      - name: ls
-        run: |
-          ls -al /tmp
-          ls -al /bin/bitcoind
-
       - name: Run tests
         id: run_tests
         env:
