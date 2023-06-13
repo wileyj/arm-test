@@ -47,12 +47,12 @@ jobs:
       # cargo nextest run --workspace  --no-fail-fast --all-targets --tests --release --build-jobs 8 --test-threads 8
       - name: ls target
         run: |
-          ls ./target
+          ls ./target/debug
 
-      # - name: Run grcov
-      #   id: run_grcov
-      #   run: |
-      #     grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+      - name: Run grcov
+        id: run_grcov
+        run: |
+          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
 
       # - uses: codecov/codecov-action@v1
       #   with:
