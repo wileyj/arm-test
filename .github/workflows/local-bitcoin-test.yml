@@ -2,7 +2,7 @@
 
 # https://github.com/actions-rs/cargo
 
-name: Local Tests
+name: Local Bitcoin Tests
 
 on:
   workflow_dispatch:
