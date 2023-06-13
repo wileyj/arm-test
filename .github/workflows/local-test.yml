@@ -37,21 +37,21 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          components: rustfmt,grcov,nextest
+          components: llvm-tools-preview
+
+      - uses: SierraSoftworks/setup-grcov@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
 
       - name: Run tests
         id: nextest
+        env:
+          RUSTFLAGS: "-Cinstrument-coverage"
+          LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
         run: |
+          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
           cargo nextest run --workspace
-
-      # - name: Run tests
-      #   id: nextest
-      #   env:
-      #     RUSTFLAGS: "-Cinstrument-coverage"
-      #     LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-      #   run: |
-      #     curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
-      #     cargo nextest run --workspace
 
       # - name: Nextest
       #   id: run_nextest
