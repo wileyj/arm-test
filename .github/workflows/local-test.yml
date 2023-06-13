@@ -36,6 +36,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
 
+      - name: ls
+        run: |
+          ls -al /tmp
+          ls -al /bin/bitcoind
+
       - name: Run tests
         id: run_tests
         env:
@@ -45,10 +50,16 @@ jobs:
           curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
           cargo nextest run --workspace  --no-fail-fast --all-targets --tests --release --build-jobs 8 --test-threads 8
 
-      - name: Run grcov
-        id: run_grcov
+      - name: ls target
         run: |
-          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+          ls .
+          ls ./target
+          ls ./target/debug
+
+      # - name: Run grcov
+      #   id: run_grcov
+      #   run: |
+      #     grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
 
       # - uses: codecov/codecov-action@v1
       #   with:
