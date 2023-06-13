@@ -28,8 +28,8 @@ jobs:
       - name: Install Bitcoin Binary
         id: bitcoin_binary
         run: |
-          curl -LSf https://bitcoin.org/bin/bitcoin-core-${{BTC_VERSION}}/bitcoin-${{BTC_VERSION}}-x86_64-linux-gnu.tar.gz | tar zxf - -C /tmp
-          ln -s /tmp/bitcoin-${{BTC_VERSION}}/bin/bitcoind /bin/
+          curl -LSf https://bitcoin.org/bin/bitcoin-core-${BTC_VERSION}/bitcoin-${BTC_VERSION}-x86_64-linux-gnu.tar.gz | tar zxf - -C /tmp
+          ln -s /tmp/bitcoin-${BTC_VERSION}/bin/bitcoind /bin/
 
       - name: ls
         run: |
