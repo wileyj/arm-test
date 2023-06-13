@@ -31,6 +31,11 @@ jobs:
           curl -LSf https://bitcoin.org/bin/bitcoin-core-${{BTC_VERSION}}/bitcoin-${{BTC_VERSION}}-x86_64-linux-gnu.tar.gz | tar zxf - -C /tmp
           ln -s /tmp/bitcoin-${{BTC_VERSION}}/bin/bitcoind /bin/
 
+      - name: ls
+        run: |
+          ls -al /tmp
+          ls -al /bin/bitcoind
+
       - name: Install grcov
         id: install_grcov
         uses: SierraSoftworks/setup-grcov@v1
