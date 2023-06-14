@@ -35,6 +35,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version: latest
+          use-cargo: true
 
       - name: Run tests
         id: run_tests
@@ -44,7 +45,6 @@ jobs:
         run: |
           curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
           cargo nextest run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
-      # cargo nextest run --workspace  --no-fail-fast --all-targets --tests --release --build-jobs 8 --test-threads 8
       - name: ls target
         run: |
           ls ./target/debug
@@ -57,6 +57,25 @@ jobs:
       - name: ls grcov
         run: |
           ls -al lcov.info
+
+  open-api-validation:
+    name: OpenAPI Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the latest code
+        id: git_checkout
+        uses: actions/checkout@v3
+
+      # use the public name of the action
+      - name: redoc-cli test
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: "bundle -o ./open-api-docs.html ./docs/rpc/openapi.yaml"
+
+      - name: check result
+        run: |
+          ls -al
+          test -f ./open-api-docs.html || (echo "Missing ./open-api-docs.html from previous step." && exit 1)
 
       # - uses: codecov/codecov-action@v1
       #   with:
