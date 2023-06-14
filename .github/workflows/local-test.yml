@@ -41,7 +41,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: grcov,nextest
+          args: grcov nextest
 
       # - name: Run tests
       #   id: run_tests
