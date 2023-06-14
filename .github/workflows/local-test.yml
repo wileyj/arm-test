@@ -29,22 +29,38 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
+      # - name: Install grcov
+      #   id: install_grcov
+      #   uses: SierraSoftworks/setup-grcov@v1
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     version: latest
+      #     use-cargo: true
       - name: Install grcov
         id: install_grcov
-        uses: SierraSoftworks/setup-grcov@v1
+        uses: actions-rs/cargo@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: latest
-          use-cargo: true
+          command: install
+          args: grcov,nextest
 
+      # - name: Run tests
+      #   id: run_tests
+      #   env:
+      #     RUSTFLAGS: "-Cinstrument-coverage"
+      #     LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
+      #   run: |
+      #     curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+      #     cargo nextest run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
       - name: Run tests
         id: run_tests
         env:
           RUSTFLAGS: "-Cinstrument-coverage"
           LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-        run: |
-          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
-          cargo nextest run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
+        uses: actions-rs/cargo@v1
+        with:
+          command: nextest
+          args: run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
+
       - name: ls target
         run: |
           ls ./target/debug
