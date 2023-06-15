@@ -53,7 +53,7 @@ jobs:
       - name: ls
         run: |
           echo "cargo:"
-          ls -al .cargo
+          ls -al ~/.cargo
           echo "target:"
           ls -al target
   full-genesis:
@@ -71,7 +71,7 @@ jobs:
       - name: ls-pre-cache
         run: |
           echo "cargo:"
-          ls -al .cargo
+          ls -al ~/.cargo
           echo "target:"
           ls -al target
 
@@ -87,7 +87,7 @@ jobs:
       - name: ls-post-cache
         run: |
           echo "cargo:"
-          ls -al .cargo
+          ls -al ~/.cargo
           echo "target:"
           ls -al target
 
