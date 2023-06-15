@@ -40,7 +40,7 @@ jobs:
       - name: Cargo Build
         id: cargo_build
         run: |
-          cargo build
+          cargo nextest run --workspace --no-run --all-targets --tests --release --build-jobs 8
 
       - name: Save Cargo Cache
         id: cargo_cache
@@ -84,10 +84,8 @@ jobs:
 
       - name: ls-post-cache
         run: |
-          echo "cargo/bin:"
-          ls -al ~/.cargo/bin
-          echo "target/debug:"
-          ls -al target/debug
+          echo "target/release/deps:"
+          ls -al  target/release/deps
 
       # - uses: actions-rust-lang/setup-rust-toolchain@v1
       #   id: setup_rust_toolchain
