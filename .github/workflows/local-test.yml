@@ -52,10 +52,10 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: ls
         run: |
-          echo "cargo:"
-          ls -al ~/.cargo
-          echo "target:"
-          ls -al target
+          echo "cargo/bin:"
+          ls -al ~/.cargo/bin
+          echo "target/debug:"
+          ls -al target/debug
   full-genesis:
     env:
       RUSTFLAGS: "-Cinstrument-coverage"
@@ -70,10 +70,8 @@ jobs:
 
       - name: ls-pre-cache
         run: |
-          echo "cargo:"
-          ls -al ~/.cargo
-          echo "target:"
-          ls -al target
+          echo "cargo/bin:"
+          ls -al ~/.cargo/bin
 
       - name: Restore Cargo Cache
         id: cargo_cache
@@ -86,10 +84,10 @@ jobs:
 
       - name: ls-post-cache
         run: |
-          echo "cargo:"
-          ls -al ~/.cargo
-          echo "target:"
-          ls -al target
+          echo "cargo/bin:"
+          ls -al ~/.cargo/bin
+          echo "target/debug:"
+          ls -al target/debug
 
       # - uses: actions-rust-lang/setup-rust-toolchain@v1
       #   id: setup_rust_toolchain
