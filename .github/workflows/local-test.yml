@@ -47,13 +47,15 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
+            ~/.cargo
+            ./target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
+      - name: ls
+        run: |
+          echo "cargo:"
+          ls -al .cargo
+          echo "target:"
+          ls -al target
   full-genesis:
     env:
       RUSTFLAGS: "-Cinstrument-coverage"
@@ -66,17 +68,28 @@ jobs:
         id: git_checkout
         uses: actions/checkout@v3
 
+      - name: ls-pre-cache
+        run: |
+          echo "cargo:"
+          ls -al .cargo
+          echo "target:"
+          ls -al target
+
       - name: Restore Cargo Cache
         id: cargo_cache
         uses: actions/cache/restore@v3
         with:
           path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
+            ~/.cargo
+            ./target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: ls-post-cache
+        run: |
+          echo "cargo:"
+          ls -al .cargo
+          echo "target:"
+          ls -al target
 
       # - uses: actions-rust-lang/setup-rust-toolchain@v1
       #   id: setup_rust_toolchain
