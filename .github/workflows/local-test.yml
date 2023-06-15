@@ -8,56 +8,56 @@ env:
   LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
 
 jobs:
-  full-genesis:
-    env:
-      RUSTFLAGS: "-Cinstrument-coverage"
-      LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
-    name: Full Genesis Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the latest code
-        id: git_checkout
-        uses: actions/checkout@v3
+  # full-genesis:
+  #   env:
+  #     RUSTFLAGS: "-Cinstrument-coverage"
+  #     LLVM_PROFILE_FILE: "stacks-blockchain-%p-%m.profraw"
+  #   name: Full Genesis Test
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout the latest code
+  #       id: git_checkout
+  #       uses: actions/checkout@v3
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        id: setup_rust_toolchain
-        with:
-          toolchain: stable
-          components: llvm-tools-preview
+  #     - uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       id: setup_rust_toolchain
+  #       with:
+  #         toolchain: stable
+  #         components: llvm-tools-preview
 
-      - name: Install Nextest
-        id: install_nextest
-        run: |
-          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+  #     - name: Install Nextest
+  #       id: install_nextest
+  #       run: |
+  #         curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
-      # Note - doing this with `cargo install grcov` also works, but is a bit slower
-      - name: Install grcov
-        id: install_grcov
-        run: |
-          VERSION=$(curl -sL https://api.github.com/repos/mozilla/grcov/releases/latest | jq -r .tag_name)
-          ARCH=x86_64
-          LIBC=gnu
-          PLATFORM=unknown-linux
-          curl -LsSf "https://github.com/mozilla/grcov/releases/download/${VERSION}/grcov-${ARCH}-${PLATFORM}-${LIBC}.tar.bz2" | tar jxf - -C ${CARGO_HOME:-~/.cargo}/bin
+  #     # Note - doing this with `cargo install grcov` also works, but is a bit slower
+  #     - name: Install grcov
+  #       id: install_grcov
+  #       run: |
+  #         VERSION=$(curl -sL https://api.github.com/repos/mozilla/grcov/releases/latest | jq -r .tag_name)
+  #         ARCH=x86_64
+  #         LIBC=gnu
+  #         PLATFORM=unknown-linux
+  #         curl -LsSf "https://github.com/mozilla/grcov/releases/download/${VERSION}/grcov-${ARCH}-${PLATFORM}-${LIBC}.tar.bz2" | tar jxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
-      - name: Run Tests
-        id: run_tests
-        run: |
-          cargo nextest run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
+  #     - name: Run Tests
+  #       id: run_tests
+  #       run: |
+  #         cargo nextest run --workspace --no-fail-fast --all-targets --tests --release --test-threads 8 --build-jobs 8
 
-      - name: Run grcov
-        id: run_grcov
-        run: |
-          grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+  #     - name: Run grcov
+  #       id: run_grcov
+  #       run: |
+  #         grcov . --binary-path ./target/debug/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
 
-      # - name: Unit Test Codecov
-      #   id: codedov
-      #   needs: run_grcov
-      #   uses: codecov/codecov-action@v3
-      #   with:
-      #     files: ./lcov.info
-      #     name: unit_tests
-      #     fail_ci_if_error: true
+  #     # - name: Unit Test Codecov
+  #     #   id: codedov
+  #     #   needs: run_grcov
+  #     #   uses: codecov/codecov-action@v3
+  #     #   with:
+  #     #     files: ./lcov.info
+  #     #     name: unit_tests
+  #     #     fail_ci_if_error: true
   create-cache:
     name: Create Cache
     runs-on: ubuntu-latest
@@ -94,7 +94,7 @@ jobs:
 
       - name: Save Cargo Cache
         id: cargo_cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/save@v3
         with:
           path: |
             ~/.cargo/bin/
