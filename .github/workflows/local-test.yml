@@ -55,7 +55,7 @@ jobs:
           echo "cargo/bin:"
           ls -al ~/.cargo/bin
           echo "target/debug:"
-          ls -al target/debug
+          ls -al target/release/deps
   full-genesis:
     env:
       RUSTFLAGS: "-Cinstrument-coverage"
