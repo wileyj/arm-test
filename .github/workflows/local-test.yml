@@ -72,12 +72,12 @@ jobs:
         id: run_redoc
         uses: seeebiii/redoc-cli-github-action@v10
         with:
-          args: "bundle -o /dist/open-api-docs.html ./docs/rpc/openapi.yaml"
+          args: "bundle -o ./open-api-docs.html ./docs/rpc/openapi.yaml"
 
       - name: check result
         id: check_redoc
         run: |
-          test -f /dist/open-api-docs.html || (echo "Missing ./open-api-docs.html from previous step." && exit 1)
+          test -f ./open-api-docs.html || (echo "Missing ./open-api-docs.html from previous step." && exit 1)
 
       - name: Upload bundled html
         id: upload_html_artifact
@@ -85,4 +85,4 @@ jobs:
         with:
           name: open-api-bundle
           path: |
-            dist
+            ./dist/open-api-docs.html
