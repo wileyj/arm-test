@@ -85,4 +85,4 @@ jobs:
         with:
           name: open-api-bundle
           path: |
-            ./dist/open-api-docs.html
+            ./open-api-docs.html
