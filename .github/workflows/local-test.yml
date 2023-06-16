@@ -40,11 +40,12 @@ jobs:
       - name: Cargo Build
         id: cargo_build
         run: |
-          cargo nextest run --workspace --no-run --all-targets --tests --release --build-jobs 8
+          cargo build --workspace --release --all-targets
 
       # caches can exist already if the code has not changed.
       #  1. how long to keep a cache?
       #  2. should the cache be removed after each action has run?
+      #  3. delete cache when PR is closed: https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#managing-caches
       - name: Save Cargo Cache
         id: cargo_cache
         uses: actions/cache/save@v3
@@ -52,7 +53,11 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ github.event.repository.name }}-${{ github.actor }}-${{ github.job_workflow_sha }}
+          # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          # ${{github.sha}}
+          # github.ref_name
+          # github.job_workflow_sha
 
   full-genesis:
     env:
@@ -195,3 +200,11 @@ jobs:
           name: open-api-bundle
           path: |
             ./open-api-docs.html
+
+  # delete-cache:
+  #   name: Delete Cache
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout the latest code
+  #       id: git_checkout
+  #       uses: actions/checkout@v3
