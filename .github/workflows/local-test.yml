@@ -53,7 +53,8 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ github.event.repository.name }}-${{ github.actor }}-${{ github.sha }}
+          key: ${{ github.ref_name }}-${{ github.actor }}-${{ github.sha }}
+          # key: ${{ github.event.repository.name }}-${{ github.actor }}-${{ github.sha }}
           # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           # ${{github.sha}}
           # github.ref_name
