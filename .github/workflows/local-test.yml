@@ -167,7 +167,8 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ github.ref_name }}-${{ github.actor }}-${{ github.sha }}
+          # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run Tests
         id: run_tests
