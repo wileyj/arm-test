@@ -238,6 +238,10 @@ jobs:
   delete-cache:
     name: Delete Cache
     runs-on: ubuntu-latest
+    needs:
+      - create-cache
+      - full-genesis
+      - sampled-genesis
     steps:
       # - name: Checkout the latest code
       #   id: git_checkout
