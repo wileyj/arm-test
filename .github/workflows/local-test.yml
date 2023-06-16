@@ -235,13 +235,19 @@ jobs:
           path: |
             ./open-api-docs.html
 
-  # delete-cache:
-  #   name: Delete Cache
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout the latest code
-  #       id: git_checkout
-  #       uses: actions/checkout@v3
+  delete-cache:
+    name: Delete Cache
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Checkout the latest code
+      #   id: git_checkout
+      #   uses: actions/checkout@v3
+      - name: Cleanup
+        run: |
+          gh extension install actions/gh-actions-cache
+          REPO=${{ github.repository }}
+          gh actions-cache delete ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }} -R ${{ github.repository }} --confirm
+          echo "Done"
 
 # github.triggering_actor: wileyj
 # github.actor: wileyj
@@ -253,3 +259,6 @@ jobs:
 # github.job: create-cache
 
 # key: ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }}
+
+# gh actions-cache delete wileyj-master-branch-59aaf2a557ab250e3b09c83bc2e3ac2f2467b623 -R wileyj/arm-test --confirm
+
