@@ -16,6 +16,16 @@ jobs:
         id: git_checkout
         uses: actions/checkout@v3
 
+      - name: echo stuff
+        run: |
+          echo "github.triggering_actor: ${{ github.triggering_actor }}"
+          echo "github.actor: ${{ github.actor }}"
+          echo "github.sha: ${{ github.sha }}"
+          echo "github.run_id: ${{ github.run_id }}"
+          echo "github.ref_type: ${{ github.ref_type }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          echo "github.job_workflow_sha: ${{ github.job_workflow_sha }}"
+          echo "github.job: ${{ github.job }}"
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         id: setup_rust_toolchain
         with:
@@ -53,7 +63,7 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ github.ref_name }}-${{ github.actor }}-${{ github.sha }}
+          key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
           # key: ${{ github.event.repository.name }}-${{ github.actor }}-${{ github.sha }}
           # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           # ${{github.sha}}
@@ -71,6 +81,17 @@ jobs:
       - name: Checkout the latest code
         id: git_checkout
         uses: actions/checkout@v3
+
+      - name: echo stuff
+        run: |
+          echo "github.triggering_actor: ${{ github.triggering_actor }}"
+          echo "github.actor: ${{ github.actor }}"
+          echo "github.sha: ${{ github.sha }}"
+          echo "github.run_id: ${{ github.run_id }}"
+          echo "github.ref_type: ${{ github.ref_type }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          echo "github.job_workflow_sha: ${{ github.job_workflow_sha }}"
+          echo "github.job: ${{ github.job }}"
 
       - name: Restore Cargo Cache
         id: cargo_cache
@@ -160,6 +181,17 @@ jobs:
         id: git_checkout
         uses: actions/checkout@v3
 
+      - name: echo stuff
+        run: |
+          echo "github.triggering_actor: ${{ github.triggering_actor }}"
+          echo "github.actor: ${{ github.actor }}"
+          echo "github.sha: ${{ github.sha }}"
+          echo "github.run_id: ${{ github.run_id }}"
+          echo "github.ref_type: ${{ github.ref_type }}"
+          echo "github.ref_name: ${{ github.ref_name }}"
+          echo "github.job_workflow_sha: ${{ github.job_workflow_sha }}"
+          echo "github.job: ${{ github.job }}"
+
       - name: Restore Cargo Cache
         id: cargo_cache
         uses: actions/cache/restore@v3
@@ -167,7 +199,7 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ github.ref_name }}-${{ github.actor }}-${{ github.sha }}
+          key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
           # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run Tests
