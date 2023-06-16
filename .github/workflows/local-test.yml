@@ -236,8 +236,6 @@ jobs:
             ./open-api-docs.html
 
   delete-cache:
-    secrets:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     name: Delete Cache
     runs-on: ubuntu-latest
     steps:
