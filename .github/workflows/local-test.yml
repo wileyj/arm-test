@@ -63,12 +63,9 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
+          key: ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }}
+          # key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
           # key: ${{ github.event.repository.name }}-${{ github.actor }}-${{ github.sha }}
-          # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          # ${{github.sha}}
-          # github.ref_name
-          # github.job_workflow_sha
 
   full-genesis:
     env:
@@ -100,7 +97,9 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }}
+          # key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
+          # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       # - uses: actions-rust-lang/setup-rust-toolchain@v1
       #   id: setup_rust_toolchain
@@ -199,7 +198,8 @@ jobs:
           path: |
             ~/.cargo
             ./target/
-          key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
+          key: ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }}
+          # key: ${{ github.actor }}-${{ github.ref_name }}-${{ github.sha }}
           # key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run Tests
@@ -242,3 +242,14 @@ jobs:
   #     - name: Checkout the latest code
   #       id: git_checkout
   #       uses: actions/checkout@v3
+
+# github.triggering_actor: wileyj
+# github.actor: wileyj
+# github.sha: aa4a72e5233c9337bcc76fbcec61cc7eaaf2dd51
+# github.run_id: 5292050177
+# github.ref_type: branch
+# github.ref_name: master
+# github.job_workflow_sha:
+# github.job: create-cache
+
+# key: ${{ github.triggering_actor }}-${{ github.ref_name }}-${{ github.ref_type }}-${{ github.sha }}
