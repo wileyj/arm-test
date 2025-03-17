@@ -95,7 +95,6 @@ jobs:
     name: Docker Image (Source)
     uses: ./.github/workflows/image-build-source.yml
     needs:
-      - rustfmt
       - check-release
     secrets: inherit
 
@@ -115,7 +114,6 @@ jobs:
       github.event_name == 'merge_group'
     name: Create Test Cache
     needs:
-      - rustfmt
       - check-release
     uses: ./.github/workflows/create-cache.yml
 
@@ -136,7 +134,6 @@ jobs:
       github.event_name == 'merge_group'
     name: Stacks Core Tests
     needs:
-      - rustfmt
       - create-cache
       - check-release
     uses: ./.github/workflows/stacks-core-tests.yml
