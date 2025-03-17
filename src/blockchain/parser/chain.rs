@@ -1,85 +1,93 @@
-use std::cell::RefCell;
+use crate::blockchain::parser::blkfile::BlkFile;
+use crate::blockchain::parser::index::ChainIndex;
+use crate::blockchain::parser::types::CoinType;
+use crate::blockchain::proto::block::Block;
+use crate::common::Result;
+use crate::ParserOptions;
 use std::collections::HashMap;
 
-use crate::blockchain::parser::blkfile::BlkFile;
-use crate::blockchain::parser::index::{get_block_index, BlockIndexRecord};
-use crate::blockchain::proto::block::Block;
-use crate::common::utils;
-use crate::errors::OpResult;
-use crate::ParserOptions;
-
-/// Holds the index of longest valid chain
-pub struct ChainStorage<'a> {
-    blocks: Vec<BlockIndexRecord>,
-    index: usize,
-    blk_files: HashMap<usize, BlkFile>,
-    options: &'a RefCell<ParserOptions>,
+/// Manages the index and data of longest valid chain
+pub struct ChainStorage {
+    chain_index: ChainIndex,
+    blk_files: HashMap<u64, BlkFile>, // maps blk_index to BlkFile
+    coin: CoinType,
+    verify: bool,
 }
 
-impl<'a> ChainStorage<'a> {
-    #[inline]
-    pub fn new(options: &'a RefCell<ParserOptions>) -> OpResult<Self> {
-        let blockchain_dir = options.borrow().blockchain_dir.clone();
+impl ChainStorage {
+    pub fn new(options: &ParserOptions) -> Result<Self> {
         Ok(Self {
-            blocks: get_block_index(blockchain_dir.join("index").as_path())?,
-            blk_files: BlkFile::from_path(blockchain_dir.as_path())?,
-            index: options.borrow().range.start,
-            options,
+            chain_index: ChainIndex::new(options)?,
+            blk_files: BlkFile::from_path(options.blockchain_dir.as_path())?,
+            coin: options.coin.clone(),
+            verify: options.verify,
         })
     }
 
-    /// Returns the next hash without removing it
-    pub fn get_next(&mut self) -> Option<Block> {
-        if let Some(end) = self.options.borrow().range.end {
-            if self.index == end {
-                return None;
+    /// Returns the block at the given height
+    pub fn get_block(&mut self, height: u64) -> Result<Option<Block>> {
+        // Read block
+        let block_meta = match self.chain_index.get(height) {
+            Some(block_meta) => block_meta,
+            None => return Ok(None),
+        };
+
+        let blk_file = match self.blk_files.get_mut(&block_meta.blk_index) {
+            Some(blk_file) => blk_file,
+            None => {
+                return Err("Block file for block not found".into());
             }
+        };
+        let block = match blk_file.read_block(block_meta.data_offset, &self.coin) {
+            Ok(block) => block,
+            Err(e) => {
+                return Err(format!("Unable to read block: {}", e).into());
+            }
+        };
+
+        // Check if blk file can be closed
+        if height >= self.chain_index.max_height_by_blk(block_meta.blk_index) {
+            blk_file.close()
         }
 
-        let meta = self.blocks.get(self.index)?;
-        let block = self
-            .blk_files
-            .get(&meta.n_file)?
-            .read_block(meta.n_data_pos, self.options.borrow().coin_type.version_id)
-            .ok()?;
-
-        if self.options.borrow().verify {
-            self.verify(&block);
+        if self.verify {
+            self.verify(&block, height)?;
         }
 
-        self.index += 1;
-        Some(block)
+        Ok(Some(block))
     }
 
     /// Verifies the given block in a chain.
     /// Panics if not valid
-    fn verify(&self, block: &Block) {
-        block.verify_merkle_root();
-        if self.index == 0 {
-            let genesis_hash = self.options.borrow().coin_type.genesis_hash;
-            if block.header.hash != genesis_hash {
-                panic!(
-                    "Hash of genesis doesn't match!\n  -> expected: {}\n  -> got: {}\n",
-                    utils::arr_to_hex_swapped(&genesis_hash),
-                    utils::arr_to_hex_swapped(&block.header.hash),
+    fn verify(&self, block: &Block, height: u64) -> Result<()> {
+        block.verify_merkle_root()?;
+        if height == 0 {
+            if block.header.hash != self.coin.genesis_hash {
+                let msg = format!(
+                    "Genesis block hash doesn't match!\n  -> expected: {}\n  -> got: {}\n",
+                    &self.coin.genesis_hash, &block.header.hash,
                 );
+                return Err(msg.into());
             }
         } else {
-            let prev_hash = self.blocks.get(self.index - 1).unwrap().block_hash;
+            let prev_hash = self
+                .chain_index
+                .get(height - 1)
+                .expect("unable to fetch prev block in chain index")
+                .block_hash;
             if block.header.value.prev_hash != prev_hash {
-                panic!(
+                let msg = format!(
                     "prev_hash for block {} doesn't match!\n  -> expected: {}\n  -> got: {}\n",
-                    utils::arr_to_hex_swapped(&block.header.hash),
-                    utils::arr_to_hex_swapped(&block.header.value.prev_hash),
-                    utils::arr_to_hex_swapped(&prev_hash)
+                    &block.header.hash, &block.header.value.prev_hash, &prev_hash
                 );
+                return Err(msg.into());
             }
         }
+        Ok(())
     }
 
-    /// Returns number of remaining blocks
     #[inline]
-    pub fn remaining(&self) -> usize {
-        self.blocks.len().saturating_sub(self.index)
+    pub(crate) const fn max_height(&self) -> u64 {
+        self.chain_index.max_height()
     }
 }

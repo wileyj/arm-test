@@ -4,7 +4,6 @@ use crate::blockchain::proto::tx::EvaluatedTx;
 use crate::blockchain::proto::tx::TxOutpoint;
 use crate::blockchain::proto::Hashed;
 use crate::blockchain::proto::ToRaw;
-use crate::common::utils;
 
 pub struct UnspentValue {
     pub block_height: u64,
@@ -20,9 +19,7 @@ pub fn remove_unspents(
 ) -> u64 {
     for input in &tx.value.inputs {
         let key = input.outpoint.to_bytes();
-        if unspents.contains_key(&key) {
-            unspents.remove(&key);
-        }
+        unspents.remove(&key);
     }
     tx.value.in_count.value
 }
@@ -51,7 +48,7 @@ pub fn insert_unspents(
             None => {
                 debug!(
                     target: "callback", "Ignoring invalid utxo in: {} ({})",
-                    utils::arr_to_hex_swapped(&tx.hash),
+                    &tx.hash,
                     output.script.pattern
                 );
             }
@@ -64,9 +61,11 @@ pub fn insert_unspents(
 mod tests {
     use super::*;
     use crate::blockchain::parser::reader::BlockchainRead;
+    use crate::blockchain::proto::block::Block;
     use crate::blockchain::proto::header::BlockHeader;
     use crate::blockchain::proto::varuint::VarUint;
-    use blockchain::proto::block::Block;
+
+    use bitcoin::hashes::{sha256d, Hash};
     use std::io::{BufReader, Cursor};
 
     #[test]
@@ -74,8 +73,8 @@ mod tests {
         let mut unspents: HashMap<Vec<u8>, UnspentValue> = HashMap::new();
         let header = BlockHeader {
             version: 0,
-            prev_hash: [0u8; 32],
-            merkle_root: [0u8; 32],
+            prev_hash: sha256d::Hash::all_zeros(),
+            merkle_root: sha256d::Hash::all_zeros(),
             timestamp: 0,
             bits: 0,
             nonce: 0,
@@ -106,7 +105,7 @@ mod tests {
         ];
         let mut reader = BufReader::new(Cursor::new(raw_data));
         let txs = reader.read_txs(1, 0x00).unwrap();
-        let block1 = Block::new(0, header.clone(), VarUint::from(1u8), txs);
+        let block1 = Block::new(0, header.clone(), None, VarUint::from(1u8), txs);
 
         for tx in &block1.txs {
             remove_unspents(&tx, &mut unspents);
@@ -244,7 +243,7 @@ mod tests {
         ];
         let mut reader = BufReader::new(Cursor::new(raw_data));
         let txs = reader.read_txs(1, 0x00).unwrap();
-        let block2 = Block::new(0, header.clone(), VarUint::from(1u8), txs);
+        let block2 = Block::new(0, header.clone(), None, VarUint::from(1u8), txs);
 
         for tx in &block2.txs {
             remove_unspents(&tx, &mut unspents);

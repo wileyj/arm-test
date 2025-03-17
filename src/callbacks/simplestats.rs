@@ -1,19 +1,16 @@
+use bitcoin::hashes::{sha256d, Hash};
 use std::collections::HashMap;
 use std::io::{self, Write};
 
-use clap::{App, ArgMatches, SubCommand};
+use clap::{ArgMatches, Command};
 
-use crate::blockchain::parser::types::CoinType;
 use crate::blockchain::proto::block::{self, Block};
 use crate::blockchain::proto::script::ScriptPattern;
 use crate::blockchain::proto::ToRaw;
 use crate::callbacks::Callback;
-use crate::common::utils;
-use crate::errors::OpResult;
+use crate::common::{utils, Result};
 
-#[derive(Default)]
 pub struct SimpleStats {
-    //X coin_type: CoinType,
     n_valid_blocks: u64,
     block_sizes: Vec<u32>,
 
@@ -24,18 +21,38 @@ pub struct SimpleStats {
     n_tx_total_volume: u64,
 
     /// Biggest value transaction (value, height, txid)
-    tx_biggest_value: (u64, u64, [u8; 32]),
+    tx_biggest_value: (u64, u64, sha256d::Hash),
     /// Biggest size transaction (size, height, txid)
-    tx_biggest_size: (usize, u64, [u8; 32]),
+    tx_biggest_size: (usize, u64, sha256d::Hash),
     /// Contains transaction type count
     n_tx_types: HashMap<ScriptPattern, u64>,
     /// First occurence of transaction type
-    /// (block_height, txid)
-    tx_first_occs: HashMap<ScriptPattern, (u64, [u8; 32], u32)>,
+    /// (block_height, txid, index)
+    tx_first_occs: HashMap<ScriptPattern, (u64, sha256d::Hash, u32)>,
 
     /// Time stats
     t_between_blocks: Vec<u32>,
     last_timestamp: u32,
+}
+
+impl Default for SimpleStats {
+    fn default() -> Self {
+        SimpleStats {
+            n_valid_blocks: 0,
+            block_sizes: vec![],
+            n_tx: 0,
+            n_tx_inputs: 0,
+            n_tx_outputs: 0,
+            n_tx_total_fee: 0,
+            n_tx_total_volume: 0,
+            tx_biggest_value: (0, 0, sha256d::Hash::all_zeros()),
+            tx_biggest_size: (0, 0, sha256d::Hash::all_zeros()),
+            n_tx_types: HashMap::new(),
+            tx_first_occs: HashMap::new(),
+            t_between_blocks: vec![],
+            last_timestamp: 0,
+        }
+    }
 }
 
 impl SimpleStats {
@@ -44,12 +61,12 @@ impl SimpleStats {
         &mut self,
         script_pattern: ScriptPattern,
         block_height: u64,
-        txid: [u8; 32],
+        txid: sha256d::Hash,
         index: u32,
     ) {
         // Strip exact OP_RETURN bytes
         let pattern = match script_pattern {
-            ScriptPattern::DataOutput(_) => ScriptPattern::DataOutput(String::new()),
+            ScriptPattern::OpReturn(_) => ScriptPattern::OpReturn(String::new()),
             p => p,
         };
         if !self.n_tx_types.contains_key(&pattern) {
@@ -129,16 +146,14 @@ impl SimpleStats {
         writeln!(
             buffer,
             "        seen in block #{}, txid: {}\n",
-            height,
-            utils::arr_to_hex_swapped(&txid)
+            height, &txid
         )?;
         let (value, height, txid) = self.tx_biggest_size;
         writeln!(buffer, "   -> biggest size tx:\t\t{} bytes", value,)?;
         writeln!(
             buffer,
             "        seen in block #{}, txid: {}\n",
-            height,
-            utils::arr_to_hex_swapped(&txid)
+            height, &txid
         )?;
         Ok(())
     }
@@ -158,8 +173,7 @@ impl SimpleStats {
             writeln!(
                 buffer,
                 "        first seen in block #{}, txid: {}\n",
-                pos.0,
-                utils::arr_to_hex_swapped(&pos.1)
+                pos.0, &pos.1
             )?;
         }
         Ok(())
@@ -167,29 +181,29 @@ impl SimpleStats {
 }
 
 impl Callback for SimpleStats {
-    fn build_subcommand<'a, 'b>() -> App<'a, 'b>
+    fn build_subcommand() -> Command
     where
         Self: Sized,
     {
-        SubCommand::with_name("simplestats")
+        Command::new("simplestats")
             .about("Shows various Blockchain stats")
             .version("0.1")
             .author("gcarq <egger.m@protonmail.com>")
     }
 
-    fn new(_: &ArgMatches) -> OpResult<Self>
+    fn new(_: &ArgMatches) -> Result<Self>
     where
         Self: Sized,
     {
         Ok(SimpleStats::default())
     }
 
-    fn on_start(&mut self, _: &CoinType, _: u64) -> OpResult<()> {
-        info!(target: "callback", "Executing SimpleStats ...");
+    fn on_start(&mut self, _: u64) -> Result<()> {
+        info!(target: "callback", "Executing simplestats ...");
         Ok(())
     }
 
-    fn on_block(&mut self, block: &Block, block_height: u64) -> OpResult<()> {
+    fn on_block(&mut self, block: &Block, block_height: u64) -> Result<()> {
         self.n_valid_blocks += 1;
         self.n_tx += block.tx_count.value;
         self.block_sizes.push(block.size);
@@ -200,7 +214,7 @@ impl Callback for SimpleStats {
                 self.n_tx_total_fee += tx.value.outputs[0]
                     .out
                     .value
-                    .checked_sub(block::get_base_reward(block_height as u64))
+                    .checked_sub(block::get_base_reward(block_height))
                     .unwrap_or_default();
             }
 
@@ -240,7 +254,7 @@ impl Callback for SimpleStats {
         Ok(())
     }
 
-    fn on_complete(&mut self, _: u64) -> OpResult<()> {
+    fn on_complete(&mut self, _: u64) -> Result<()> {
         let mut buffer = Vec::with_capacity(4096);
         self.print_simple_stats(&mut buffer)?;
         writeln!(&mut buffer)?;

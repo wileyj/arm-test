@@ -1,3 +1,5 @@
+use bitcoin::hashes::{sha256d, Hash};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt;
 
 use crate::blockchain::proto::script;
@@ -38,7 +40,7 @@ impl EvaluatedTx {
     ) -> Self {
         // Evaluate and wrap all outputs to process them later
         let outputs = outputs
-            .into_iter()
+            .into_par_iter()
             .map(|o| EvaluatedTxOut::eval_script(o, version_id))
             .collect();
         EvaluatedTx {
@@ -55,7 +57,7 @@ impl EvaluatedTx {
     pub fn is_coinbase(&self) -> bool {
         if self.in_count.value == 1 {
             let input = self.inputs.first().unwrap();
-            return input.outpoint.txid == [0u8; 32] && input.outpoint.index == 0xFFFFFFFF;
+            return input.outpoint.txid.as_ref() == [0u8; 32] && input.outpoint.index == 0xFFFFFFFF;
         }
         false
     }
@@ -73,6 +75,7 @@ impl fmt::Debug for EvaluatedTx {
 }
 
 impl From<RawTx> for EvaluatedTx {
+    #[inline]
     fn from(tx: RawTx) -> Self {
         Self::new(
             tx.version,
@@ -92,19 +95,19 @@ impl ToRaw for EvaluatedTx {
             Vec::with_capacity((4 + self.in_count.value + self.out_count.value + 4) as usize);
 
         // Serialize version
-        bytes.extend_from_slice(&self.version.to_le_bytes());
+        bytes.extend(&self.version.to_le_bytes());
         // Serialize all TxInputs
-        bytes.extend_from_slice(&self.in_count.to_bytes());
+        bytes.extend(&self.in_count.to_bytes());
         for i in &self.inputs {
-            bytes.extend_from_slice(&i.to_bytes());
+            bytes.extend(&i.to_bytes());
         }
         // Serialize all TxOutputs
-        bytes.extend_from_slice(&self.out_count.to_bytes());
+        bytes.extend(&self.out_count.to_bytes());
         for o in &self.outputs {
-            bytes.extend_from_slice(&o.out.to_bytes());
+            bytes.extend(&o.out.to_bytes());
         }
         // Serialize locktime
-        bytes.extend_from_slice(&self.locktime.to_le_bytes());
+        bytes.extend(&self.locktime.to_le_bytes());
         bytes
     }
 }
@@ -112,22 +115,22 @@ impl ToRaw for EvaluatedTx {
 /// TxOutpoint references an existing transaction output
 #[derive(PartialEq, Eq, Hash)]
 pub struct TxOutpoint {
-    pub txid: [u8; 32],
+    pub txid: sha256d::Hash,
     pub index: u32, // 0-based offset within tx
 }
 
 impl TxOutpoint {
-    pub fn new(txid: [u8; 32], index: u32) -> Self {
+    #[inline]
+    pub fn new(txid: sha256d::Hash, index: u32) -> Self {
         Self { txid, index }
     }
 }
 
 impl ToRaw for TxOutpoint {
-    #[inline]
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(32 + 4);
-        bytes.extend_from_slice(&self.txid);
-        bytes.extend_from_slice(&self.index.to_le_bytes());
+        bytes.extend(self.txid.as_byte_array());
+        bytes.extend(&self.index.to_le_bytes());
         bytes
     }
 }
@@ -135,7 +138,7 @@ impl ToRaw for TxOutpoint {
 impl fmt::Debug for TxOutpoint {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt.debug_struct("TxOutpoint")
-            .field("txid", &utils::arr_to_hex_swapped(&self.txid))
+            .field("txid", &self.txid)
             .field("index", &self.index)
             .finish()
     }
@@ -150,13 +153,12 @@ pub struct TxInput {
 }
 
 impl ToRaw for TxInput {
-    #[inline]
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(36 + 5 + self.script_len.value as usize + 4);
-        bytes.extend_from_slice(&self.outpoint.to_bytes());
-        bytes.extend_from_slice(&self.script_len.to_bytes());
-        bytes.extend_from_slice(&self.script_sig);
-        bytes.extend_from_slice(&self.seq_no.to_le_bytes());
+        bytes.extend(&self.outpoint.to_bytes());
+        bytes.extend(&self.script_len.to_bytes());
+        bytes.extend(&self.script_sig);
+        bytes.extend(&self.seq_no.to_le_bytes());
         bytes
     }
 }
@@ -196,12 +198,11 @@ pub struct TxOutput {
 }
 
 impl ToRaw for TxOutput {
-    #[inline]
     fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = Vec::with_capacity(8 + 5 + self.script_len.value as usize);
-        bytes.extend_from_slice(&self.value.to_le_bytes());
-        bytes.extend_from_slice(&self.script_len.to_bytes());
-        bytes.extend_from_slice(&self.script_pubkey);
+        bytes.extend(&self.value.to_le_bytes());
+        bytes.extend(&self.script_len.to_bytes());
+        bytes.extend(&self.script_pubkey);
         bytes
     }
 }

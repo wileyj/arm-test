@@ -17,10 +17,7 @@ pub struct VarUint {
 impl VarUint {
     #[inline]
     fn new(value: u64, buf: Vec<u8>) -> VarUint {
-        VarUint {
-            value: value as u64,
-            buf,
-        }
+        VarUint { value, buf }
     }
 
     pub fn read_from<R: Read + ?Sized>(reader: &mut R) -> io::Result<VarUint> {
@@ -46,7 +43,7 @@ impl From<u16> for VarUint {
     fn from(value: u16) -> Self {
         let mut buf: Vec<u8> = Vec::with_capacity(3);
         buf.push(0xfd);
-        buf.extend_from_slice(&value.to_le_bytes());
+        buf.extend(&value.to_le_bytes());
         VarUint::new(value as u64, buf)
     }
 }
@@ -55,7 +52,7 @@ impl From<u32> for VarUint {
     fn from(value: u32) -> Self {
         let mut buf: Vec<u8> = Vec::with_capacity(5);
         buf.push(0xfe);
-        buf.extend_from_slice(&value.to_le_bytes());
+        buf.extend(&value.to_le_bytes());
         VarUint::new(value as u64, buf)
     }
 }
@@ -64,8 +61,8 @@ impl From<u64> for VarUint {
     fn from(value: u64) -> Self {
         let mut buf: Vec<u8> = Vec::with_capacity(9);
         buf.push(0xff);
-        buf.extend_from_slice(&value.to_le_bytes());
-        VarUint::new(value as u64, buf)
+        buf.extend(&value.to_le_bytes());
+        VarUint::new(value, buf)
     }
 }
 
@@ -77,6 +74,7 @@ impl ToRaw for VarUint {
 }
 
 impl fmt::Display for VarUint {
+    #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
     }
