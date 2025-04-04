@@ -73,23 +73,23 @@ jobs:
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
             TARGET_CPU=x86-64-v3
           push: ${{ env.DOCKER_PUSH }}
+          sbom: true
+          provenance: mode=max # default for public repos
 
-      - name: Generate artifact attestation
+      - name: Generate artifact attestation (${{ github.event.repository.name }})
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
         with:
           # subject-name: index.docker.io/${{ env.docker-org }}/${{ github.event.repository.name }}
           subject-name:  |
             index.docker.io/${{env.docker-org}}/${{ github.event.repository.name }}
-            index.docker.io/${{env.docker-org}}/stacks-blockchain
           subject-digest: ${{ steps.docker_build.outputs.digest }}
           push-to-registry: true
 
-      # ## Attest docker image
-      # - name: Generate artifact attestation
-      #   uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
-      #   with:
-      #     subject-name: ${{env.docker-org}}/${{ github.event.repository.name }}
-      #       # ${{ steps.docker_metadata.outputs.tags }}
-      #     subject-digest: ${{ steps.docker_build.outputs.digest }}
-      #     push-to-registry: ${{ env.DOCKER_PUSH }}
-
+      - name: Generate artifact attestation (stacks-blockchain)
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          # subject-name: index.docker.io/${{ env.docker-org }}/${{ github.event.repository.name }}
+          subject-name:  |
+            index.docker.io/${{env.docker-org}}/stacks-blockchain
+          subject-digest: ${{ steps.docker_build.outputs.digest }}
+          push-to-registry: true
