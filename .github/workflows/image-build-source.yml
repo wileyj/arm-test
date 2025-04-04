@@ -21,6 +21,13 @@ jobs:
   image:
     name: Build Image
     runs-on: ubuntu-latest
+    ## Requires the repo environment "Push to Docker", which will trigger a secondary approval step before running this workflow.
+    environment: "Push to Docker"
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+      packages: write
     steps:
       ## Setup Docker for the builds
       - name: Docker setup
@@ -66,3 +73,20 @@ jobs:
             GIT_COMMIT=${{ env.GITHUB_SHA_SHORT }}
             TARGET_CPU=x86-64-v3
           push: ${{ env.DOCKER_PUSH }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+        with:
+          subject-name: index.docker.io/${{ env.docker-org }}/${{ github.event.repository.name }}
+          subject-digest: ${{ steps.docker_build.outputs.digest }}
+          push-to-registry: true
+
+      # ## Attest docker image
+      # - name: Generate artifact attestation
+      #   uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2 # v2.2.3
+      #   with:
+      #     subject-name: ${{env.docker-org}}/${{ github.event.repository.name }}
+      #       # ${{ steps.docker_metadata.outputs.tags }}
+      #     subject-digest: ${{ steps.docker_build.outputs.digest }}
+      #     push-to-registry: ${{ env.DOCKER_PUSH }}
+
