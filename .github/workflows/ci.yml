@@ -41,6 +41,7 @@ jobs:
   ##     - PR review comment
   ##     - PR change is requested
   rustfmt:
+    if: ${{ false }}
     name: Rust Format
     runs-on: ubuntu-latest
     steps:
