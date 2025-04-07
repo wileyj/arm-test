@@ -55,6 +55,7 @@ jobs:
     steps:
       - name: Build Nexttest Cache
         id: nextest-cache
-        uses: stacks-network/actions/stacks-core/cache/build-cache@main
+        uses: wileyj/actions/stacks-core/cache/build-cache@chore/attestation
+        # uses: stacks-network/actions/stacks-core/cache/build-cache@main
         with:
           genesis: true
